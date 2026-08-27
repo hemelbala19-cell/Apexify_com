@@ -7,12 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: #f0f7f7; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .phone-container { width: 100%; max-width: 412px; height: 850px; background: #eef6f6; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
         
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #fff; }
-        .header-icon { width: 35px; height: 35px; background: #f1f8f6; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #00875a; font-size: 16px; }
+        .header-icon { width: 35px; height: 35px; background: #f1f8f6; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #00875a; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .header-icon:active { transform: scale(0.9); }
         .logo-area { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 22px; color: #00875a; }
 
         .banner-container { padding: 10px 15px; }
@@ -21,6 +22,15 @@
         .action-card { background: #fde8e8; margin: 0 15px 15px 15px; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #fbd5d5; }
         .action-card h3 { color: #9b1c1c; font-size: 18px; margin-bottom: 8px; }
         .action-card p { color: #771d1d; font-size: 14px; margin-bottom: 15px; line-height: 1.4; }
+        
+        /* Button Animation */
+        .activate-btn, .wallet-btn, .action-btn, .copy-ref-btn, .pay-method {
+            transition: all 0.2s ease-in-out;
+        }
+        .activate-btn:active, .wallet-btn:active, .action-btn:active, .copy-ref-btn:active, .pay-method:active {
+            transform: scale(0.95);
+        }
+
         .activate-btn { background: #c81e51; color: #fff; border: none; padding: 12px 25px; border-radius: 30px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(200, 30, 81, 0.3); }
 
         .success-active-card { background: linear-gradient(135deg, #00875a 0%, #005c3d 100%); margin: 0 15px 15px 15px; padding: 20px; border-radius: 20px; text-align: center; color: #fff; box-shadow: 0 6px 15px rgba(0, 135, 90, 0.3); display: none; }
@@ -33,23 +43,18 @@
             50% { transform: translateY(-5px); }
         }
 
-        .asset-card { background: linear-gradient(135deg, #1b3b36 0%, #0d2320 100%); margin: 0 15px 15px 15px; padding: 20px; border-radius: 20px; color: #fff; }
-        .asset-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .asset-title { font-size: 12px; letter-spacing: 1px; color: #9ca3af; }
-        .currency-tabs { background: rgba(255,255,255,0.1); padding: 3px; border-radius: 20px; display: flex; gap: 5px; }
-        .currency-tabs span { padding: 2px 10px; font-size: 12px; border-radius: 15px; }
-        .currency-tabs span.active { background: #fff; color: #000; font-weight: 600; }
-        .asset-amount { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
-        .asset-footer { font-size: 11px; color: #9ca3af; }
+        .wallets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 15px 15px 15px; }
+        .wallet-card-box { background: linear-gradient(135deg, #1b3b36 0%, #0d2320 100%); padding: 15px; border-radius: 15px; color: #fff; }
+        .wallet-card-box.income { background: linear-gradient(135deg, #00875a 0%, #004d32 100%); }
+        .w-title { font-size: 11px; letter-spacing: 0.5px; color: #cbd5e1; margin-bottom: 5px; }
+        .w-amount { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
 
-        /* Animated Referral Bonus Banner Style */
-        .ref-bonus-banner { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); margin: 0 15px 12px 15px; padding: 12px 15px; border-radius: 15px; text-align: center; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); animation: pulseGlow 2s infinite; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
+        .wallet-actions { display: flex; gap: 10px; margin: 0 15px 15px 15px; display: none; }
+        .wallet-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dep-action-btn { background: #00875a; }
+        .wit-action-btn { background: #2563eb; }
+
+        .ref-bonus-banner { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); margin: 0 15px 12px 15px; padding: 12px 15px; border-radius: 15px; text-align: center; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
 
         .referral-section { background: #fff; margin: 0 15px 20px 15px; padding: 15px; border-radius: 15px; border: 1px solid #e5e7eb; }
         .referral-section h4 { font-size: 14px; color: #00875a; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
@@ -59,24 +64,25 @@
         .ref-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #6b7280; }
 
         .bottom-nav { background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; position: sticky; bottom: 0; width: 100%; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #6b7280; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #6b7280; cursor: pointer; }
         .nav-item.active { color: #00875a; font-weight: 600; }
         .nav-item i { font-size: 18px; margin-bottom: 3px; }
         .task-btn-container { position: relative; top: -20px; }
-        .task-circle { background: #00875a; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; border: 4px solid #fff; }
+        .task-circle { background: #00875a; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0, 135, 90, 0.3); transition: 0.2s; }
+        .task-circle:active { transform: scale(0.9); }
 
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 100; }
         .modal-content { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 25px 20px; text-align: center; max-height: 85vh; overflow-y: auto; }
         .wallet-top-icon { width: 50px; height: 50px; background: #eef6f6; color: #00875a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: -50px auto 15px auto; font-size: 22px; border: 4px solid #fff; }
         
-        .payment-methods { display: flex; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
-        .pay-method { flex: 1; border: 2px solid #e5e7eb; border-radius: 15px; padding: 15px 10px; cursor: pointer; text-align: center; }
+        .payment-methods { display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px; }
+        .pay-method { flex: 1; border: 2px solid #e5e7eb; border-radius: 12px; padding: 10px; cursor: pointer; text-align: center; }
         .pay-method.selected { border-color: #00875a; background: #f0fdf4; }
         .action-btn { background: #00875a; color: #fff; width: 100%; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
         
         .deposit-header { background: #00875a; color: #fff; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 8px; margin-bottom: 15px; text-align: left; }
-        .wallet-box { background: #f3f4f6; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0 20px 0; border: 1px solid #e5e7eb; text-align: left; }
-        .trx-input { width: 100%; padding: 12px; border: 1px solid #dc2626; border-radius: 8px; margin-bottom: 15px; outline: none; }
+        .wallet-box { background: #f3f4f6; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0 15px 0; border: 1px solid #e5e7eb; text-align: left; }
+        .trx-input, .custom-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; outline: none; font-size: 14px; text-align: left; }
     </style>
 </head>
 <body>
@@ -108,17 +114,22 @@
                 <p>আপনার অ্যাকাউন্ট সফলভাবে একটিভ করা হয়েছে। এখন আপনি সকল কাজের সুবিধা ও উইথড্র উপভোগ করতে পারবেন!</p>
             </div>
 
-            <div class="asset-card">
-                <div class="asset-top">
-                    <span class="asset-title">TOTAL ASSET VALUE</span>
-                    <div class="currency-tabs">
-                        <span class="active">BDT</span>
-                        <span>USDT</span>
-                        <span>INR</span>
-                    </div>
+            <div class="wallets-grid">
+                <div class="wallet-card-box">
+                    <div class="w-title">TOTAL ASSET</div>
+                    <div class="w-amount">৳ <span id="userBalance">0.00</span></div>
+                    <div style="font-size: 10px; color: #9ca3af;">Main Asset</div>
                 </div>
-                <div class="asset-amount">৳ <span id="userBalance">0.00</span></div>
-                <div class="asset-footer">Your complete Apexify account summary</div>
+                <div class="wallet-card-box income">
+                    <div class="w-title">INCOME WALLET</div>
+                    <div class="w-amount">৳ <span id="incomeBalance">0.00</span></div>
+                    <div style="font-size: 10px; color: #d1fae5;">Withdrawable</div>
+                </div>
+            </div>
+
+            <div class="wallet-actions" id="walletActions">
+                <button class="wallet-btn dep-action-btn" onclick="openModal('depositDirectModal')"><i class="fa-solid fa-wallet"></i> ডিপোজিট</button>
+                <button class="wallet-btn wit-action-btn" onclick="openModal('withdrawModal')"><i class="fa-solid fa-money-bill-transfer"></i> উইথড্র</button>
             </div>
 
             <div class="ref-bonus-banner">
@@ -142,7 +153,7 @@
             <div class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></div>
             <div class="nav-item"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
             <div class="nav-item task-btn-container">
-                <div class="task-circle"><i class="fa-solid fa-briefcase"></i></div>
+                <div class="task-circle" onclick="alert('টাস্ক সেকশন শীঘ্রই আসছে!')"><i class="fa-solid fa-briefcase"></i></div>
                 <span style="margin-top: 15px;">Task</span>
             </div>
             <div class="nav-item"><i class="fa-solid fa-server"></i><span>Server</span></div>
@@ -160,52 +171,86 @@
                 </div>
 
                 <div class="payment-methods">
-                    <div class="pay-method selected" onclick="selectGateway('bkash')">
-                        <div style="font-weight: bold; color: #e2136e; font-size: 16px; margin-bottom: 3px;">bKash</div>
-                        <span style="font-size: 11px; color: #6b7280;">Tap to select</span>
+                    <div class="pay-method selected" onclick="selectGateway('bkash', event)">
+                        <div style="font-weight: bold; color: #e2136e; font-size: 14px;">bKash</div>
                     </div>
-                    <div class="pay-method" onclick="selectGateway('nagad')">
-                        <div style="font-weight: bold; color: #f7931e; font-size: 16px; margin-bottom: 3px;">Nagad</div>
-                        <span style="font-size: 11px; color: #6b7280;">Tap to select</span>
+                    <div class="pay-method" onclick="selectGateway('nagad', event)">
+                        <div style="font-weight: bold; color: #f7931e; font-size: 14px;">Nagad</div>
                     </div>
                 </div>
 
-                <button class="action-btn" onclick="goToDeposit()">
-                    <i class="fa-solid fa-lock"></i> Pay & Activate Account
-                </button>
+                <button class="action-btn" onclick="goToDeposit()">Pay & Activate</button>
                 <button style="background:none; border:none; color:#6b7280; cursor:pointer; font-size: 14px;" onclick="closeAllModals()">পরে নেব</button>
             </div>
         </div>
 
         <div class="modal-overlay" id="depositModal">
             <div class="modal-content" style="text-align: left;">
-                <div class="deposit-header">
-                    BDT <span id="popupFeeText">150</span> <span style="float: right;">PAY SERVICE</span>
-                    <div style="font-size: 11px; font-weight: normal;">কম বা বেশি টাকা পাঠাবেন না</div>
-                </div>
-
+                <div class="deposit-header">BDT <span id="popupFeeText">150</span> <span style="float: right;">PAY SERVICE</span></div>
                 <div id="bkashSection">
-                    <div style="background: #e2136e; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px;">BKASH Deposit</div>
-                    <label style="font-size: 12px; color: #333;">Wallet No *</label>
+                    <div style="background: #e2136e; color: #fff; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 10px; font-size:13px;">BKASH Number</div>
                     <div class="wallet-box">
-                        <strong id="bkashNum" style="font-size: 16px;">01403594918</strong>
+                        <strong id="bkashNum" style="font-size: 15px;">01403594918</strong>
                         <i class="fa-regular fa-copy" style="cursor: pointer; color: #00875a;" onclick="copyNum(window.bkashNumberDynamic || '01403594918')"></i>
                     </div>
                 </div>
-
                 <div id="nagadSection" style="display: none;">
-                    <div style="background: #f7931e; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px;">NAGAD Deposit</div>
-                    <label style="font-size: 12px; color: #333;">Wallet No *</label>
+                    <div style="background: #f7931e; color: #fff; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 10px; font-size:13px;">NAGAD Number</div>
                     <div class="wallet-box">
-                        <strong id="nagadNum" style="font-size: 16px;">01403593914</strong>
+                        <strong id="nagadNum" style="font-size: 15px;">01403593914</strong>
                         <i class="fa-regular fa-copy" style="cursor: pointer; color: #00875a;" onclick="copyNum(window.nagadNumberDynamic || '01403593914')"></i>
                     </div>
                 </div>
-
-                <label style="font-size: 12px; font-weight: bold; color: #333;">সেন্ড মানির TrxID নাম্বারটি লিখুন <span style="color:red;">(প্রয়োজন)</span></label>
-                <input type="text" id="trxInput" class="trx-input" placeholder="TrxID অবশ্যই পূরণ করতে হবে।">
-
+                <label style="font-size: 12px; font-weight: bold; color: #333;">TrxID নাম্বার দিন</label>
+                <input type="text" id="trxInput" class="trx-input" placeholder="TrxID দিন">
                 <button class="action-btn" onclick="submitPayment()">নিশ্চিত</button>
+                <button style="background:none; border:none; color:#6b7280; width: 100%; text-align: center; cursor: pointer;" onclick="closeAllModals()">বাতিল</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="depositDirectModal">
+            <div class="modal-content" style="text-align: left;">
+                <div class="deposit-header">টাকা ডিপোজিট করুন</div>
+                <label style="font-size: 12px; font-weight: bold;">টাকার পরিমাণ</label>
+                <input type="number" id="directDepAmount" class="custom-input" placeholder="পরিমাণ">
+                <label style="font-size: 12px; font-weight: bold;">TrxID নাম্বার</label>
+                <input type="text" id="directDepTrx" class="custom-input" placeholder="TrxID">
+                <button class="action-btn" onclick="submitDirectDeposit()">সাবমিট</button>
+                <button style="background:none; border:none; color:#6b7280; width: 100%; text-align: center; cursor: pointer;" onclick="closeAllModals()">বাতিল</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="withdrawModal">
+            <div class="modal-content" style="text-align: left;">
+                <div class="deposit-header" style="background: #2563eb;">উইথড্র রিকোয়েস্ট (Min: ৳<span id="minWithdrawDisplay">50</span>)</div>
+                
+                <label style="font-size: 12px; font-weight: bold; color: #333;">উইথড্র মাধ্যম</label>
+                <div class="payment-methods" id="withdrawMethodContainer">
+                    <div class="pay-method selected" onclick="selectWithdrawMethod('bkash', event)">
+                        <div style="font-weight: bold; color: #e2136e; font-size: 14px;">bKash</div>
+                    </div>
+                    <div class="pay-method" onclick="selectWithdrawMethod('nagad', event)">
+                        <div style="font-weight: bold; color: #f7931e; font-size: 14px;">Nagad</div>
+                    </div>
+                </div>
+
+                <label style="font-size: 12px; font-weight: bold; color: #333;">অ্যাকাউন্ট টাইপ (Personal / Agent)</label>
+                <div class="payment-methods" id="accountTypeContainer">
+                    <div class="pay-method selected" onclick="selectAccountType('Personal', event)">
+                        <div style="font-size: 13px; font-weight: bold;">Personal</div>
+                    </div>
+                    <div class="pay-method" onclick="selectAccountType('Agent', event)">
+                        <div style="font-size: 13px; font-weight: bold;">Agent</div>
+                    </div>
+                </div>
+
+                <label style="font-size: 12px; font-weight: bold; color: #333;">যে নম্বরে টাকা নেবেন</label>
+                <input type="text" id="withdrawAccountNo" class="custom-input" placeholder="01XXXXXXXXX">
+
+                <label style="font-size: 12px; font-weight: bold; color: #333;">টাকার পরিমাণ (ইনকাম ওয়ালেট থেকে)</label>
+                <input type="number" id="withdrawAmount" class="custom-input" placeholder="পরিমাণ লিখুন">
+
+                <button class="action-btn" style="background: #2563eb;" onclick="submitWithdrawRequest()">উইথড্র জমা দিন</button>
                 <button style="background:none; border:none; color:#6b7280; width: 100%; text-align: center; cursor: pointer;" onclick="closeAllModals()">বাতিল</button>
             </div>
         </div>
@@ -213,7 +258,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, addDoc, collection, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, addDoc, collection, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
@@ -228,98 +273,19 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // தனி ইউজার আইডি তৈরি বা লোড করা
         let currentUserId = localStorage.getItem("apexify_user_id");
         if (!currentUserId) {
             currentUserId = "USER-" + Math.floor(1000 + Math.random() * 9000);
             localStorage.setItem("apexify_user_id", currentUserId);
         }
 
+        // Check if referred by someone
+        const urlParams = new URLSearchParams(window.location.search);
+        let refBy = urlParams.get('ref');
+        if(refBy && refBy !== currentUserId) {
+            localStorage.setItem("apexify_ref_by", refBy);
+        }
+
         document.getElementById('referralLink').value = `https://apexify-com.vercel.app/?ref=${currentUserId}`;
 
-        // Settings Listener
-        onSnapshot(doc(db, "settings", "general"), (docSnap) => {
-            if (docSnap.exists()) {
-                let data = docSnap.data();
-                if(data.fee) {
-                    document.getElementById('displayFee').innerText = data.fee;
-                    document.getElementById('popupFeeText').innerText = data.fee;
-                }
-                if(data.refBonus) {
-                    document.getElementById('displayRefBonus').innerText = data.refBonus;
-                }
-                if(data.bkash) {
-                    document.getElementById('bkashNum').innerText = data.bkash;
-                    window.bkashNumberDynamic = data.bkash;
-                }
-                if(data.nagad) {
-                    document.getElementById('nagadNum').innerText = data.nagad;
-                    window.nagadNumberDynamic = data.nagad;
-                }
-            }
-        });
-
-        // শুধু নির্দিষ্ট ইউজারের স্ট্যাটাস চেক করা
-        onSnapshot(doc(db, "users", currentUserId), (docSnap) => {
-            let actionCard = document.getElementById('actionRequiredCard');
-            let successCard = document.getElementById('successActiveCard');
-
-            if (docSnap.exists() && docSnap.data().status === 'Active') {
-                actionCard.style.display = 'none';
-                successCard.style.display = 'block';
-            } else {
-                actionCard.style.display = 'block';
-                successCard.style.display = 'none';
-            }
-        });
-
-        window.submitPayment = async function() {
-            let trx = document.getElementById('trxInput').value;
-            let fee = document.getElementById('displayFee').innerText;
-            if(!trx) {
-                alert('দয়া করে TrxID লিখুন!');
-                return;
-            }
-            try {
-                await setDoc(doc(db, "users", currentUserId), { userId: currentUserId, status: "Pending" }, { merge: true });
-
-                await addDoc(collection(db, "pending_deposits"), {
-                    userId: currentUserId,
-                    method: window.selectedMethod || 'bkash',
-                    trx: trx,
-                    amount: fee,
-                    timestamp: new Date()
-                });
-                alert('পেমেন্ট সফলভাবে সাবমিট হয়েছে! অ্যাডমিন অ্যাপ্রুভ করলে অ্যাকাউন্ট সচল হবে।');
-                closeAllModals();
-            } catch (e) {
-                alert('এরর: ' + e.message);
-            }
-        }
-    </script>
-
-    <script>
-        let selectedMethod = 'bkash';
-        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
-        function closeAllModals() {
-            document.getElementById('packageModal').style.display = 'none';
-            document.getElementById('depositModal').style.display = 'none';
-        }
-        function selectGateway(method) {
-            selectedMethod = method;
-            document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-        function goToDeposit() {
-            document.getElementById('packageModal').style.display = 'none';
-            if(selectedMethod === 'bkash') {
-                document.getElementById('bkashSection').style.display = 'block';
-                document.getElementById('nagadSection').style.display = 'none';
-            } else {
-                document.getElementById('bkashSection').style.display = 'none';
-                document.getElementById('nagadSection').style.display = 'block';
-            }
-            document.getElementById('depositModal').style.display = 'flex';
-        }
-        function copyNum(num) {
-            navigator.clipboard.wr
+        onSnapshot(doc
