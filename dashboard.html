@@ -18,13 +18,11 @@
         .banner-container { padding: 10px 15px; }
         .banner { background: #111; border-radius: 15px; overflow: hidden; color: #fff; padding: 15px; }
 
-        /* Action Card (Un-active state) */
         .action-card { background: #fde8e8; margin: 0 15px 15px 15px; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #fbd5d5; }
         .action-card h3 { color: #9b1c1c; font-size: 18px; margin-bottom: 8px; }
         .action-card p { color: #771d1d; font-size: 14px; margin-bottom: 15px; line-height: 1.4; }
         .activate-btn { background: #c81e51; color: #fff; border: none; padding: 12px 25px; border-radius: 30px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(200, 30, 81, 0.3); }
 
-        /* Active Success Animation Card */
         .success-active-card { background: linear-gradient(135deg, #00875a 0%, #005c3d 100%); margin: 0 15px 15px 15px; padding: 20px; border-radius: 20px; text-align: center; color: #fff; box-shadow: 0 6px 15px rgba(0, 135, 90, 0.3); animation: popIn 0.8s ease-in-out; display: none; }
         .success-active-card h3 { font-size: 20px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .success-active-card p { font-size: 13px; opacity: 0.9; }
@@ -47,6 +45,15 @@
         .currency-tabs span.active { background: #fff; color: #000; font-weight: 600; }
         .asset-amount { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
         .asset-footer { font-size: 11px; color: #9ca3af; }
+
+        /* Animated Referral Bonus Banner Style */
+        .ref-bonus-banner { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); margin: 0 15px 12px 15px; padding: 12px 15px; border-radius: 15px; text-align: center; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); animation: pulseGlow 2s infinite; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
 
         .referral-section { background: #fff; margin: 0 15px 20px 15px; padding: 15px; border-radius: 15px; border: 1px solid #e5e7eb; }
         .referral-section h4 { font-size: 14px; color: #00875a; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
@@ -116,6 +123,10 @@
                 </div>
                 <div class="asset-amount">৳ <span id="userBalance">0.00</span></div>
                 <div class="asset-footer">Your complete Apexify account summary</div>
+            </div>
+
+            <div class="ref-bonus-banner">
+                <i class="fa-solid fa-gift"></i> প্রতি রেফার বোনাস: ৳<span id="displayRefBonus">50</span> টাকা!
             </div>
 
             <div class="referral-section">
@@ -221,15 +232,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const currentUserId = "USER-1025"; // ডেমো ইউজার আইডি
+        const currentUserId = "USER-1025";
 
-        // 1. Settings Listener (Fee & Numbers)
+        // Settings Listener (Fee, Referral Bonus & Numbers)
         onSnapshot(doc(db, "settings", "general"), (docSnap) => {
             if (docSnap.exists()) {
                 let data = docSnap.data();
                 if(data.fee) {
                     document.getElementById('displayFee').innerText = data.fee;
                     document.getElementById('popupFeeText').innerText = data.fee;
+                }
+                if(data.refBonus) {
+                    document.getElementById('displayRefBonus').innerText = data.refBonus;
                 }
                 if(data.bkash) {
                     document.getElementById('bkashNum').innerText = data.bkash;
@@ -242,7 +256,7 @@
             }
         });
 
-        // 2. User Status Listener (Switches Action Card to Success Animated Banner on Approval)
+        // User Status Listener (Switches Action Card to Success Animated Banner on Approval)
         onSnapshot(doc(db, "users", currentUserId), (docSnap) => {
             let actionCard = document.getElementById('actionRequiredCard');
             let successCard = document.getElementById('successActiveCard');
@@ -309,10 +323,4 @@
         function copyReferralLink() {
             let refInput = document.getElementById('referralLink');
             refInput.select();
-            navigator.clipboard.writeText(refInput.value);
-            alert('রেফারেল লিংক কপি করা হয়েছে!');
-        }
-    </script>
-</body>
-                                                                        </html>
-                        
+     
