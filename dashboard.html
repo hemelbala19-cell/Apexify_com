@@ -9,11 +9,20 @@
     <style>  
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; }  
         body { background-color: #f0f2f5; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }  
-        .app-container { width: 100%; max-width: 480px; background: #ffffff; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding-bottom: 85px; }  
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #ffffff; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #f0f0f0; }  
+        
+        .app-container { 
+            width: 100%; 
+            max-width: 480px; 
+            background: #ffffff; 
+            min-height: 100vh; 
+            position: relative; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); 
+            padding-bottom: 95px; /* নিচের নেভবারের জন্য ফাঁকা জায়গা */
+        }  
+
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #ffffff; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #f0f0f0; }  
         .support-btn, .notification-btn { background: #e6fcf5; color: #0ca678; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }  
         .brand-area { display: flex; align-items: center; gap: 8px; }  
-        .brand-logo { width: 32px; height: 32px; object-fit: cover; border-radius: 50%; border: 1px solid #0ca678; }  
         .brand-name { font-weight: 700; font-size: 18px; color: #0b2545; }  
         
         .view { display: none; padding: 16px; }  
@@ -80,7 +89,6 @@
         .profile-avatar { width: 65px; height: 65px; background: #e6fcf5; color: #0ca678; border: 2px solid #0b2545; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; }  
         .profile-name { font-size: 20px; font-weight: 700; color: #0b2545; }  
         .profile-phone { font-size: 12px; color: #666; margin-top: 2px; }  
-        .profile-edit-btn { position: absolute; top: 0; right: 0; width: 35px; height: 35px; background: #f8f9fa; border: 1px solid #eaeaea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; font-size: 14px; cursor: pointer; }  
         .profile-action-banner { background: #ef4444; color: white; text-align: center; padding: 10px; border-radius: 30px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 15px; }  
         .profile-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }  
         .p-stat-box { background: #f8f9fa; border: 1px solid #eaeaea; border-radius: 14px; padding: 12px; text-align: center; }  
@@ -102,8 +110,21 @@
         .method-card.selected { border-color: #0ca678; background: #f4fbf9; }  
         .pay-proceed-btn { background: #0ca678; color: white; border: none; width: 100%; padding: 12px; border-radius: 25px; font-weight: 600; font-size: 14px; cursor: pointer; }  
 
-        /* Bottom Navigation Bar */  
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: #ffffff; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #eee; z-index: 1000; }  
+        /* Bottom Navigation Bar Fix */  
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%; 
+            max-width: 480px; 
+            background: #ffffff; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 10px 0; 
+            border-top: 1px solid #eee; 
+            z-index: 1000; 
+        }  
         .nav-item { text-align: center; color: #888; text-decoration: none; font-size: 11px; cursor: pointer; flex: 1; }  
         .nav-item i { display: block; font-size: 18px; margin-bottom: 2px; }  
         .nav-item.active { color: #0ca678; }  
@@ -232,4 +253,4 @@
                     <div class="pkg-row"><span>মূল্য (Price):</span><strong>৳ 500</strong></div>  
                     <div class="pkg-row"><span>প্রতিদিন ইনকাম:</span><strong style="color: #0ca678;">৳ 350</strong></div>  
                 </div>  
- 
+                <button class="buy-pkg
