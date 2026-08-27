@@ -3,129 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apexify Admin Dashboard</title>
+    <title>Apexify - Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
-        body { background: #f3f4f6; color: #333; }
+        body { background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
         
-        #loginScreen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0d2320; }
-        .login-card { background: #fff; padding: 30px; border-radius: 12px; width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .login-card h2 { color: #00875a; margin-bottom: 20px; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
-        .login-btn { background: #00875a; color: #fff; width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .admin-container { width: 100%; max-width: 480px; background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; height: 90vh; }
+        
+        .admin-header { background: #00875a; color: #fff; padding: 20px; text-align: center; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .admin-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-        #adminDashboard { display: none; min-height: 100vh; }
-        .sidebar { width: 250px; background: #0d2320; color: #fff; position: fixed; height: 100%; padding: 20px; }
-        .sidebar h2 { color: #00875a; margin-bottom: 30px; font-size: 22px; }
-        .sidebar a { display: block; color: #9ca3af; padding: 12px; text-decoration: none; border-radius: 8px; margin-bottom: 5px; font-size: 14px; }
-        .sidebar a:hover, .sidebar a.active { background: #1b3b36; color: #fff; }
+        .section-title { font-size: 16px; font-weight: 700; color: #00875a; margin-bottom: 15px; border-bottom: 2px solid #eef6f6; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; outline: none; background: #f9fafb; transition: all 0.3s; }
+        .form-control:focus { border-color: #00875a; background: #fff; box-shadow: 0 0 0 3px rgba(0, 135, 90, 0.1); }
+
+        .save-btn { background: #00875a; color: #fff; width: 100%; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 5px; box-shadow: 0 4px 10px rgba(0, 135, 90, 0.2); }
+        .save-btn:hover { background: #006c48; }
+
+        .pending-section { margin-top: 25px; }
+        .deposit-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .deposit-info h4 { font-size: 14px; color: #111; margin-bottom: 3px; }
+        .deposit-info p { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
         
-        .main-content { margin-left: 250px; padding: 30px; }
-        .section-box { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .section-box h3 { margin-bottom: 15px; color: #1b3b36; font-size: 18px; border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        table th, table td { padding: 10px; border: 1px solid #e5e7eb; text-align: left; font-size: 13px; }
-        table th { background: #f9fafb; }
-        
-        .btn-action { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .btn-approve { background: #10b981; color: #fff; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        
-        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
-        .search-box input { padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 250px; }
-        .search-box button { padding: 8px 15px; background: #00875a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+        .approve-btn { background: #00875a; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen">
-        <div class="login-card">
-            <h2>Apexify Admin</h2>
-            <div class="form-group">
-                <label>Admin Gmail</label>
-                <input type="email" id="adminEmail" placeholder="admin@apexify.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="adminPass" placeholder="******">
-            </div>
-            <button class="login-btn" onclick="adminLogin()">লগইন করুন</button>
-        </div>
-    </div>
-
-    <div id="adminDashboard">
-        <div class="sidebar">
-            <h2>Apexify Admin</h2>
-            <a href="#" class="active"><i class="fa-solid fa-house"></i> ড্যাশবোর্ড</a>
-            <a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> লগআউট</a>
+    <div class="admin-container">
+        <div class="admin-header">
+            <i class="fa-solid fa-shield-halved"></i> Apexify Admin Panel
         </div>
 
-        <div class="main-content">
-            <div class="section-box">
-                <h3><i class="fa-solid fa-gear"></i> একাউন্ট এক্টিভেশন ও পেমেন্ট সেটিংস</h3>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <div class="form-group" style="flex: 1;">
-                        <label>এক্টিভেশন ফি (টাকা)</label>
-                        <input type="number" id="feeInput" value="150">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>বিকাশ নম্বর</label>
-                        <input type="text" id="bkashInput" value="01403594918">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>নগদ নম্বর</label>
-                        <input type="text" id="nagadInput" value="01403593914">
-                    </div>
-                </div>
-                <button class="btn-action btn-approve" style="padding: 10px 20px;" onclick="saveSettingsToFirebase()">সেটিংস সেভ করুন</button>
+        <div class="admin-body">
+            <!-- সেটিংস সেকশন -->
+            <div class="section-title">
+                <i class="fa-solid fa-gear"></i> একাউন্ট ও পেমেন্ট সেটিংস
             </div>
 
-            <div class="section-box">
-                <h3><i class="fa-solid fa-clock"></i> পেন্ডিং ডিপোজিট রিকোয়েস্ট</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ইউজার আইডি</th>
-                            <th>মেথড</th>
-                            <th>TrxID</th>
-                            <th>পরিমাণ</th>
-                            <th>অ্যাকশন</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendingDepositTable">
-                        <tr><td colspan="5" style="text-align: center;">লোড হচ্ছে...</td></tr>
-                    </tbody>
-                </table>
+            <div class="form-group">
+                <label>অ্যাক্টিভেশন ফি (টাকা)</label>
+                <input type="number" id="settingFee" class="form-control" placeholder="যেমন: 150">
             </div>
 
-            <div class="section-box">
-                <h3><i class="fa-solid fa-users-gear"></i> ইউজার ম্যানেজমেন্ট ও সার্চ</h3>
-                <div class="search-box">
-                    <input type="text" id="searchUserId" placeholder="ইউজার আইডি দিন (যেমন: USER-1025)">
-                    <button onclick="searchUser()">সার্চ</button>
+            <div class="form-group">
+                <label>প্রতি রেফার বোনাস (টাকা)</label>
+                <input type="number" id="settingRefBonus" class="form-control" placeholder="যেমন: 20">
+            </div>
+
+            <div class="form-group">
+                <label>বিকাশ নাম্বার</label>
+                <input type="text" id="settingBkash" class="form-control" placeholder="01XXXXXXXXX">
+            </div>
+
+            <div class="form-group">
+                <label>নগদ নাম্বার</label>
+                <input type="text" id="settingNagad" class="form-control" placeholder="01XXXXXXXXX">
+            </div>
+
+            <button class="save-btn" onclick="saveSettings()">সেটিংস সেভ করুন</button>
+
+            <!-- পেন্ডিং ডিপোজিট সেকশন -->
+            <div class="pending-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-list-check"></i> পেন্ডিং ডিপোজিট রিকোয়েস্ট
                 </div>
-                <div id="userInfoResult" style="background: #f9fafb; padding: 15px; border-radius: 8px; display: none;">
-                    <p><strong>ইউজার আইডি:</strong> <span id="resId"></span></p>
-                    <p><strong>স্ট্যাটাস:</strong> <span id="resStatus" style="color: green;">অ্যাক্টিভ</span></p>
-                    <p><strong>ব্যালেন্স:</strong> ৳ <span id="resBalance">0.00</span></p>
-                    <div style="margin-top: 10px; display: flex; gap: 10px;">
-                        <input type="number" id="modBalance" placeholder="টাকা (+/-)" style="padding: 5px; width: 120px;">
-                        <button class="btn-action btn-approve" onclick="updateUserBalance()">ব্যালেন্স আপডেট</button>
-                        <button class="btn-action btn-danger" onclick="toggleBanUser()">ব্যান/আনব্যান</button>
-                    </div>
+                <div id="pendingList">
+                    <p style="font-size: 13px; color: #6b7280; text-align: center;">কোনো রিকোয়েস্ট নেই...</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
@@ -140,129 +99,93 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.adminLogin = async function() {
-            let email = document.getElementById('adminEmail').value;
-            let pass = document.getElementById('adminPass').value;
-
-            if(email === 'admin@apexify.com' && pass === '123456') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                loadAdminData();
-            } else {
-                alert('ভুল জিমেইল অথবা পাসওয়ার্ড!');
+        // পুরনো সেটিংস লোড করা
+        async function loadSettings() {
+            try {
+                let docSnap = await getDoc(doc(db, "settings", "general"));
+                if (docSnap.exists()) {
+                    let data = docSnap.data();
+                    if(data.fee) document.getElementById('settingFee').value = data.fee;
+                    if(data.refBonus) document.getElementById('settingRefBonus').value = data.refBonus;
+                    if(data.bkash) document.getElementById('settingBkash').value = data.bkash;
+                    if(data.nagad) document.getElementById('settingNagad').value = data.nagad;
+                }
+            } catch(e) {
+                console.log(e);
             }
         }
+        loadSettings();
 
-        window.saveSettingsToFirebase = async function() {
-            let fee = document.getElementById('feeInput').value;
-            let bkash = document.getElementById('bkashInput').value;
-            let nagad = document.getElementById('nagadInput').value;
+        // সেটিংস সেভ করার ফাংশন
+        window.saveSettings = async function() {
+            let fee = document.getElementById('settingFee').value;
+            let refBonus = document.getElementById('settingRefBonus').value;
+            let bkash = document.getElementById('settingBkash').value;
+            let nagad = document.getElementById('settingNagad').value;
 
             try {
-                await setDoc(doc(db, "settings", "general"), { fee, bkash, nagad });
-                alert('ফায়ারবেজে সেটিংস সফলভাবে সেভ হয়েছে!');
-            } catch (e) {
+                await setDoc(doc(db, "settings", "general"), {
+                    fee: fee,
+                    refBonus: refBonus,
+                    bkash: bkash,
+                    nagad: nagad
+                }, { merge: true });
+                alert('সেটিংস সফলভাবে সেভ হয়েছে!');
+            } catch(e) {
                 alert('এরর: ' + e.message);
             }
         }
 
-        async function loadAdminData() {
-            // Load settings
-            try {
-                const docSnap = await getDoc(doc(db, "settings", "general"));
-                if (docSnap.exists()) {
-                    let data = docSnap.data();
-                    document.getElementById('feeInput').value = data.fee || 150;
-                    document.getElementById('bkashInput').value = data.bkash || '01403594918';
-                    document.getElementById('nagadInput').value = data.nagad || '01403593914';
-                }
-            } catch(e) { console.error(e); }
-
-            // Load pending deposits
-            fetchPendingDeposits();
-        }
-
+        // পেন্ডিং ডিপোজিট ফেচ করা
         async function fetchPendingDeposits() {
-            let tbody = document.getElementById('pendingDepositTable');
-            tbody.innerHTML = '';
+            let listContainer = document.getElementById('pendingList');
+            listContainer.innerHTML = '<p style="font-size: 13px; color: #6b7280; text-align: center;">লোড হচ্ছে...</p>';
+            
             try {
-                const querySnapshot = await getDocs(collection(db, "pending_deposits"));
+                let querySnapshot = await getDocs(collection(db, "pending_deposits"));
+                listContainer.innerHTML = '';
+                
                 if(querySnapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">কোনো পেন্ডিং রিকোয়েস্ট নেই</td></tr>`;
+                    listContainer.innerHTML = '<p style="font-size: 13px; color: #6b7280; text-align: center;">কোনো পেন্ডিং ডিপোজিট নেই</p>';
                     return;
                 }
-                querySnapshot.forEach((documentSnap) => {
-                    let dep = documentSnap.data();
-                    let docId = documentSnap.id;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${dep.userId}</td>
-                            <td>${dep.method.toUpperCase()}</td>
-                            <td>${dep.trx}</td>
-                            <td>৳ ${dep.amount}</td>
-                            <td>
-                                <button class="btn-action btn-approve" onclick="approveDep('${docId}')">অ্যাপ্রুভ</button>
-                                <button class="btn-action btn-danger" onclick="deleteDep('${docId}')">ডিলিট</button>
-                            </td>
-                        </tr>
+
+                querySnapshot.forEach((document) => {
+                    let item = document.data();
+                    let docId = document.id;
+                    
+                    listContainer.innerHTML += `
+                        <div class="deposit-card">
+                            <div class="deposit-info">
+                                <h4>ইউজার: ${item.userId || 'N/A'}</h4>
+                                <p>মাধ্যম: <strong>${item.method.toUpperCase()}</strong> | এমাউন্ট: ৳${item.amount}</p>
+                                <p>TrxID: <span style="color:#00875a; font-weight:bold;">${item.trx}</span></p>
+                            </div>
+                            <button class="approve-btn" onclick="approveDep('${docId}', '${item.userId}')">অ্যাপ্রুভ</button>
+                        </div>
                     `;
                 });
             } catch(e) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">ডাটা লোড করতে সমস্যা হয়েছে</td></tr>`;
+                listContainer.innerHTML = '<p style="font-size: 13px; color: red; text-align: center;">ডেটা লোড করতে সমস্যা হয়েছে</p>';
             }
         }
+        fetchPendingDeposits();
 
-        window.approveDep = async function(docId) {
+        // ডিপোজিট অ্যাপ্রুভ করার ফাংশন
+        window.approveDep = async function(docId, userId) {
             try {
+                // ইউজারের স্ট্যাটাস Active করা
+                await setDoc(doc(db, "users", userId), { status: "Active" }, { merge: true });
+                
+                // রিকোয়েস্ট ডিলিট করা
                 await deleteDoc(doc(db, "pending_deposits", docId));
+                
                 alert('ডিপোজিট সফলভাবে অ্যাপ্রুভ করা হয়েছে!');
                 fetchPendingDeposits();
-            } catch(e) { alert(e.message); }
-        }
-
-        window.deleteDep = async function(docId) {
-            try {
-                await deleteDoc(doc(db, "pending_deposits", docId));
-                fetchPendingDeposits();
-            } catch(e) { alert(e.message); }
-        }
-
-        window.searchUser = async function() {
-            let uid = document.getElementById('searchUserId').value;
-            if(!uid) { alert('ইউজার আইডি লিখুন'); return; }
-            
-            try {
-                const userRef = doc(db, "users", uid);
-                const userSnap = await getDoc(userRef);
-                
-                document.getElementById('userInfoResult').style.display = 'block';
-                document.getElementById('resId').innerText = uid;
-                
-                if (userSnap.exists()) {
-                    let uData = userSnap.data();
-                    document.getElementById('resBalance').innerText = uData.balance || 0;
-                    document.getElementById('resStatus').innerText = uData.status || 'অ্যাক্টিভ';
-                } else {
-                    document.getElementById('resBalance').innerText = "0.00";
-                    document.getElementById('resStatus').innerText = "নতুন ইউজার";
-                }
-            } catch(e) { alert(e.message); }
-        }
-    </script>
-
-    <script>
-        function logout() {
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-        }
-        function updateUserBalance() {
-            let val = document.getElementById('modBalance').value;
-            alert('ইউজার ব্যালেন্স সফলভাবে আপডেট হয়েছে!');
-        }
-        function toggleBanUser() {
-            alert('ইউজার স্ট্যাটাস পরিবর্তন করা হয়েছে!');
+            } catch(e) {
+                alert('এরর: ' + e.message);
+            }
         }
     </script>
 </body>
-  </html>
-                      
+</html>
