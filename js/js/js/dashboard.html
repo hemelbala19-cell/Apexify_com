@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Apexify</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand"><h2>Apexify</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Home</a></li>
+                <li><a href="wallet.html">Wallet</a></li>
+                <li><a href="server.html">Server</a></li>
+                <li><a href="referral.html">Referral</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="support.html">Support</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="brand-title">Apexify Dashboard</div>
+            </header>
+
+            <div class="dashboard-body">
+                <div id="actionRequiredCard" class="action-card hidden">
+                    <h3>Action Required!</h3>
+                    <p>Your account is currently inactive. Activate your account to unlock features.</p>
+                    <button id="activateAccountBtn" class="btn-danger">ACTIVATE ACCOUNT</button>
+                </div>
+
+                <div class="asset-card">
+                    <span>TOTAL ASSET VALUE</span>
+                    <h1 id="totalAssetValue">৳ 0.00</h1>
+                </div>
+
+                <div class="wallet-actions-grid">
+                    <div class="wallet-box"><span>AVAILABLE</span><h3 id="availableBalance">৳ 0.00</h3></div>
+                    <div class="wallet-box"><span>SALARY</span><h3 id="salaryBalance">৳ 0.00</h3></div>
+                    <div class="wallet-box"><span>REFERRAL</span><h3 id="referralBalance">৳ 0.00</h3></div>
+                </div>
+
+                <div id="activeButtonsContainer" class="action-buttons-row hidden">
+                    <button id="depositBtn" class="btn-success">Deposit</button>
+                    <button id="withdrawBtn" class="btn-primary">Withdraw (Cash Out)</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
