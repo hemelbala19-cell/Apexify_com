@@ -46,7 +46,6 @@
         .task-btn-container { position: relative; top: -20px; }
         .task-circle { background: #00875a; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; border: 4px solid #fff; }
 
-        /* Modal overlay */
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 100; }
         .modal-content { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 25px 20px; text-align: center; max-height: 85vh; overflow-y: auto; }
         .wallet-top-icon { width: 50px; height: 50px; background: #eef6f6; color: #00875a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: -50px auto 15px auto; font-size: 22px; border: 4px solid #fff; }
@@ -94,14 +93,14 @@
                         <span>INR</span>
                     </div>
                 </div>
-                <div class="asset-amount">৳ 0.00</div>
+                <div class="asset-amount">৳ <span id="userBalance">0.00</span></div>
                 <div class="asset-footer">Your complete Apexify account summary</div>
             </div>
 
             <div class="referral-section">
                 <h4><i class="fa-solid fa-users"></i> আপনার রেফারেল লিংক</h4>
                 <div class="referral-box">
-                    <input type="text" id="referralLink" value="https://apexify-com.vercel.app/?ref=APX10924" readonly>
+                    <input type="text" id="referralLink" value="https://apexify-com.vercel.app/?ref=USER-1025" readonly>
                     <button class="copy-ref-btn" onclick="copyReferralLink()">কপি করুন</button>
                 </div>
                 <div class="ref-stats">
@@ -122,14 +121,12 @@
             <div class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></div>
         </div>
 
-        <!-- Package/Activation Modal (New UI based on your screenshot) -->
         <div class="modal-overlay" id="packageModal">
             <div class="modal-content">
                 <div class="wallet-top-icon"><i class="fa-solid fa-wallet"></i></div>
                 <h3 style="font-size: 20px; margin-bottom: 5px;">Account Active</h3>
                 <p style="color: #6b7280; font-size: 13px; margin-bottom: 15px;">আপনি কিসের মাধ্যমে payment করতে চান?</p>
                 
-                <!-- Dynamic Fee loaded from Admin Settings -->
                 <div style="background: #f0fdf4; color: #00875a; display: inline-block; padding: 6px 20px; border-radius: 20px; font-weight: bold; font-size: 18px; margin-bottom: 20px; border: 1px solid #bbf7d0;">
                     ৳ <span id="displayFee">150</span>
                 </div>
@@ -152,7 +149,6 @@
             </div>
         </div>
 
-        <!-- Deposit TrxID Modal -->
         <div class="modal-overlay" id="depositModal">
             <div class="modal-content" style="text-align: left;">
                 <div class="deposit-header">
@@ -187,22 +183,66 @@
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, add슐, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
+            authDomain: "apexify-72bc2.firebaseapp.com",
+            projectId: "apexify-72bc2",
+            storageBucket: "apexify-72bc2.firebasestorage.app",
+            messagingSenderId: "114061131405",
+            appId: "1:114061131405:web:ffd00b701d70c164976cc4",
+            measurementId: "G-RB6KW4S7JL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load Settings and User Data on Start
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch settings
+                const settingsRef = doc(db, "settings", "general");
+                const settingsSnap = await getDoc(settingsRef);
+                if (settingsSnap.exists()) {
+                    let data = settingsSnap.data();
+                    document.getElementById('displayFee').innerText = data.fee || 150;
+                    document.getElementById('popupFeeText').innerText = data.fee || 150;
+                    if(data.bkash) document.getElementById('bkashNum').innerText = data.bkash;
+                    if(data.nagad) document.getElementById('nagadNum').innerText = data.nagad;
+                }
+            } catch (e) {
+                console.error("Error loading settings: ", e);
+            }
+        });
+
+        window.submitPayment = async function() {
+            let trx = document.getElementById('trxInput').value;
+            let fee = document.getElementById('displayFee').innerText;
+            if(!trx) {
+                alert('দয়া করে TrxID লিখুন!');
+                return;
+            }
+            try {
+                await addDoc(collection(db, "pending_deposits"), {
+                    userId: "USER-1025",
+                    method: window.selectedMethod || 'bkash',
+                    trx: trx,
+                    amount: fee,
+                    timestamp: new Date()
+                });
+                alert('পেমেন্ট সফলভাবে সাবমিট হয়েছে! অ্যাডমিন অ্যাপ্রুভ করলে অ্যাকাউন্ট সচল হবে।');
+                closeAllModals();
+            } catch (e) {
+                alert('পেমেন্ট সাবমিট করতে সমস্যা হয়েছে: ' + e.message);
+            }
+        }
+    </script>
+
     <script>
         let selectedMethod = 'bkash';
-
-        // Load settings from Admin Panel simulation (localStorage)
-        window.onload = function() {
-            let savedFee = localStorage.getItem('apex_activation_fee');
-            if(savedFee) {
-                document.getElementById('displayFee').innerText = savedFee;
-                document.getElementById('popupFeeText').innerText = savedFee;
-            }
-            let bNum = localStorage.getItem('apex_bkash');
-            let nNum = localStorage.getItem('apex_nagad');
-            if(bNum) document.getElementById('bkashNum').innerText = bNum;
-            if(nNum) document.getElementById('nagadNum').innerText = nNum;
-        }
-
         function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
         function closeAllModals() {
             document.getElementById('packageModal').style.display = 'none';
@@ -234,21 +274,7 @@
             navigator.clipboard.writeText(refInput.value);
             alert('রেফারেল লিংক কপি করা হয়েছে!');
         }
-        function submitPayment() {
-            let trx = document.getElementById('trxInput').value;
-            if(!trx) {
-                alert('দয়া করে TrxID লিখুন!');
-                return;
-            }
-            // Save pending deposit to localStorage for Admin Panel
-            let pendingDeposits = JSON.parse(localStorage.getItem('apex_pending_deposits')) || [];
-            pendingDeposits.push({ id: 'USER-' + Math.floor(1000 + Math.random() * 9000), method: selectedMethod, trx: trx, amount: document.getElementById('displayFee').innerText });
-            localStorage.setItem('apex_pending_deposits', JSON.stringify(pendingDeposits));
-
-            alert('পেমেন্ট সফলভাবে সাবমিট হয়েছে! অ্যাডমিন অ্যাপ্রুভ করলে অ্যাকাউন্ট সচল হবে।');
-            closeAllModals();
-        }
     </script>
 </body>
-                    </html>
-                
+    </html>
+    
