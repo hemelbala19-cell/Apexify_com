@@ -1,27 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apexify - Reach The Peak</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/auth.css">
-</head>
-<body class="auth-body">
-    <div class="auth-container" style="text-align: center; max-width: 400px; margin: 50px auto; padding: 25px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <!-- লোগো এবং স্বাগত বার্তা -->
-        <div class="auth-header" style="margin-bottom: 25px;">
-            <img src="images/logo.png" alt="Apexify Logo" style="max-width: 120px; height: auto; margin-bottom: 15px;">
-            <h2 style="color: #1F2937; font-size: 24px; margin-bottom: 5px;">Welcome to Apexify</h2>
-            <p style="color: #4F46E5; font-weight: 600; font-size: 14px; margin: 0;">Reach The Peak</p>
-        </div>
-        
-        <!-- নেভিগেশন বাটন -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-            <a href="login.html" style="display: block; width: 100%; padding: 12px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-sizing: border-box; text-align: center;">Login</a>
-            
-            <a href="register.html" style="display: block; width: 100%; padding: 12px; background-color: #1F2937; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-sizing: border-box; text-align: center;">Register</a>
-        </div>
-    </div>
-</body>
-</html>
+<!DOCTYPE html>  
+<html lang="bn">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>APEXIFY - Reach The Peak</title>  
+    <script src="https://cdn.tailwindcss.com"></script>  
+</head>  
+<body class="bg-slate-50 flex items-center justify-center min-h-screen">  
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">  
+    <div class="text-center mb-6">  
+        <h1 class="text-3xl font-extrabold text-teal-600">APEXIFY</h1>  
+        <p class="text-xs text-gray-400 tracking-widest uppercase mt-1">Reach The Peak</p>  
+        <h2 id="form-title" class="text-xl font-bold text-gray-700 mt-4">Login to Your Account</h2>  
+    </div>  
+
+    <form id="auth-form" class="space-y-4">  
+        <div id="name-field" class="hidden">  
+            <label class="block text-sm font-medium text-gray-600">Full Name</label>  
+            <input type="text" id="name" placeholder="Enter your full name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">  
+        </div>  
+
+        <div>  
+            <label class="block text-sm font-medium text-gray-600">Mobile Number</label>  
+            <input type="text" id="phone" placeholder="01XXXXXXXXX" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">  
+        </div>  
+
+        <div>  
+            <label class="block text-sm font-medium text-gray-600">Password</label>  
+            <input type="password" id="password" placeholder="Enter your password" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">  
+        </div>  
+
+        <button type="submit" id="submit-btn" class="w-full bg-teal-600 text-white py-2.5 rounded-lg font-semibold hover:bg-teal-700 transition duration-200">  
+            Login Account  
+        </button>  
+    </form>  
+
+    <div class="text-center mt-6">  
+        <p id="toggle-text" class="text-sm text-gray-600">  
+            Don't have an account?   
+            <button type="button" onclick="toggleMode()" class="text-teal-600 font-bold hover:underline">Create account</button>  
+        </p>  
+    </div>  
+</div>  
+
+<script type="module">  
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";  
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";  
+
+    const firebaseConfig = {  
+      apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",  
+      authDomain: "apexify-72bc2.firebaseapp.com",  
+      projectId: "apexify-72bc2",  
+      storageBucket: "apexify-72bc2.firebasestorage.app",  
+      messagingSenderId: "114061131405",  
+      appId: "1:114061131405:web:ffd00b701d70c164976cc4",  
+      measurementId: "G-RB6KW4S7JL"  
+    };  
+
+    const app = initializeApp(firebaseConfig);  
+    const auth = getAuth(app);  
+
+    let isRegister = false;  
+
+    window.toggleMode = function() {  
+        isRegister = !isRegister;  
+        const nameField = document.getElementById('name-field');  
+        const formTitle = document.getElementById('form-title');  
+        const submitBtn = document.getElementById('submit-btn');  
+        const toggleText = document.getElementById('toggle-text');  
+
+        if (isRegister) {  
+            nameField.classList.remove('hidden');  
+            formTitle.innerText = "Create Your APEXIFY Account";  
+            submitBtn.innerText = "Create Account";  
+            toggleText.innerHTML = `Already have an account? <button type="button" onclick="toggleMode()" class="text-teal-600 font-bold hover:underline">Login now</button>`;  
+        } else {  
+            nameField.classList.add('hidden');  
+            formTitle.innerText = "Login to Your Account";  
+            submitBtn.innerText = "Login Account";  
+            toggleText.innerHTML = `Don't have an account? <button type="button" onclick="toggleMode()" class="text-teal-600 font-bold hover:underline">Create account</button>`;  
+        }  
+    }  
+
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {  
+        e.preventDefault();  
+        const phone = document.getElementById('phone').value;  
+        const password = document.getElementById('password').value;  
+        const email = `${phone}@apexify.com`;   
+
+        try {  
+            if (isRegister) {  
+                await createUserWithEmailAndPassword(auth, email, password);  
+                alert('Account Created Successfully!');  
+                window.location.href = "dashboard.html";  
+            } else {  
+                await signInWithEmailAndPassword(auth, email, password);  
+                alert('Login Successful!');  
+                window.location.href = "dashboard.html";  
+            }  
+        } catch (error) {  
+            alert('Error: ' + error.message);  
+        }  
+    });  
+</script>  
+</body>  
+    </html>
+    
