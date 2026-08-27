@@ -8,41 +8,30 @@
     <link rel="stylesheet" href="css/auth.css">
 </head>
 <body class="auth-body">
-    <div class="auth-container">
-        <div class="auth-header">
+    <div class="auth-container" style="max-width: 400px; margin: 40px auto; padding: 25px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="images/logo.png" alt="Apexify Logo" style="max-width: 100px; height: auto; margin-bottom: 10px;">
             <h2>Create Account</h2>
-            <p>Join Apexify & Start Earning</p>
+            <p style="color: #6B7280; font-size: 14px;">Join Apexify - Reach The Peak</p>
         </div>
-
-        <form id="registerForm" class="auth-form">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="regName" required placeholder="Enter your name">
+        <form id="registerForm">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Full Name</label>
+                <input type="text" id="name" required style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 5px; box-sizing: border-box;">
             </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="regEmail" required placeholder="Enter your email">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email</label>
+                <input type="email" id="email" required style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 5px; box-sizing: border-box;">
             </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" id="regPhone" required placeholder="Enter phone number">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password</label>
+                <input type="password" id="password" required style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 5px; box-sizing: border-box;">
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="regPassword" required placeholder="Create password">
-            </div>
-            <div class="form-group">
-                <label>Referral Code (Optional)</label>
-                <input type="text" id="regReferral" placeholder="Auto-filled from link if any">
-            </div>
-            <button type="submit" class="btn-primary">Register</button>
+            <button type="submit" style="width: 100%; padding: 12px; background-color: #4F46E5; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer;">Register</button>
         </form>
-
-        <div class="auth-footer">
-            <p>Already have an account? <a href="login.html">Login here</a></p>
-        </div>
+        <p style="text-align: center; margin-top: 15px; font-size: 14px;">Already have an account? <a href="login.html" style="color: #4F46E5; text-decoration: none; font-weight: bold;">Login</a></p>
     </div>
-    <div id="toast" class="toast hidden"></div>
     <script type="module" src="js/register.js"></script>
 </body>
-</html>
+                </html>
+                
