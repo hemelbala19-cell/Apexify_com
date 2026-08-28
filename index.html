@@ -57,12 +57,10 @@
   button{font-family:inherit; cursor:pointer; border:none;}
   input, select{font-family:inherit;}
 
-  /* ---------- Typography ---------- */
   h1,h2,h3{ font-family: var(--font-display); letter-spacing:-0.02em; }
   .eyebrow{ font-family: var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary); }
   .mono{ font-family: var(--font-mono); }
 
-  /* ---------- Buttons ---------- */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     padding:15px 22px; border-radius: 999px; font-weight:600; font-size:15px;
@@ -82,15 +80,7 @@
   .btn-block{ width:100%; }
   .btn-sm{ padding:10px 16px; font-size:13px; }
   .btn[disabled]{ opacity:0.5; pointer-events:none; }
-  .btn-danger{ background: var(--danger-soft); color:var(--danger); border:1px solid rgba(255,122,122,0.3); }
 
-  .ripple::after{
-    content:''; position:absolute; inset:0; background: rgba(255,255,255,0.25);
-    opacity:0; border-radius:inherit; transition: opacity .5s;
-  }
-  .ripple:active::after{ opacity:1; transition: none; }
-
-  /* ---------- Inputs ---------- */
   .field{ margin-bottom:16px; }
   .field label{ display:block; font-size:13px; color:var(--text-muted); margin-bottom:7px; font-weight:500; }
   .field input, .field select{
@@ -101,27 +91,16 @@
     outline:none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
   }
   .field input::placeholder{ color: var(--text-faint); }
-  .field-error{ color:var(--danger); font-size:12px; margin-top:6px; }
 
-  /* ---------- Cards ---------- */
   .card{
     background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
     border:1px solid var(--line); border-radius: var(--radius); padding:20px;
   }
   .card-glow{ box-shadow: var(--shadow-lift); }
 
-  /* ---------- Layout scaffolding ---------- */
   .screen{ flex:1; display:flex; flex-direction:column; padding: 28px 22px 100px; animation: rise .45s cubic-bezier(.2,.8,.2,1); }
   @keyframes rise{ from{ opacity:0; transform: translateY(14px);} to{opacity:1; transform:translateY(0);} }
 
-  .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 18px 22px; }
-  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:19px; }
-  .brand .mark{
-    width:30px; height:30px; border-radius:9px; background: linear-gradient(135deg, var(--primary), var(--gold));
-    display:flex; align-items:center; justify-content:center; color:#04140F; font-weight:800; font-size:15px;
-  }
-
-  /* ---------- Bottom Nav ---------- */
   .bottomnav{
     position:fixed; left:50%; transform:translateX(-50%); bottom:16px; width:calc(100% - 32px); max-width:448px;
     background: rgba(15,51,44,0.9); backdrop-filter: blur(16px); border:1px solid var(--line);
@@ -137,7 +116,6 @@
   .navitem.active{ color: var(--primary); }
   .navitem.active svg{ transform: translateY(-2px); }
 
-  /* ---------- Balance hero ---------- */
   .balance-card{
     border-radius:22px; padding:26px 22px; position:relative; overflow:hidden;
     background: linear-gradient(135deg, #114A3D 0%, #0B2F28 100%);
@@ -148,36 +126,14 @@
     background: var(--primary); opacity:0.18; filter:blur(50px); top:-60px; right:-40px;
   }
   .balance-amount{ font-family: var(--font-mono); font-size:38px; font-weight:600; letter-spacing:-0.01em; }
-  .balance-amount .cents{ font-size:20px; color: var(--text-muted); }
 
-  /* ---------- Package / VIP Cards ---------- */
   .package-card{
     background: linear-gradient(145deg, #113D34 0%, #092621 100%);
     border: 1px solid rgba(232,196,104,0.3);
-    border-radius: 20px;
-    padding: 22px;
-    margin-bottom: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-  .package-card::after{
-    content:'VIP';
-    position: absolute;
-    right: -20px;
-    top: -15px;
-    font-size: 60px;
-    font-weight: 900;
-    color: rgba(232,196,104,0.05);
-    font-family: var(--font-display);
-    pointer-events: none;
+    border-radius: 20px; padding: 22px; margin-bottom: 16px; position: relative; overflow: hidden;
   }
   .package-features{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin: 16px 0;
-    font-size: 13px;
-    color: var(--text-muted);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; font-size: 13px; color: var(--text-muted);
   }
   .package-features b{ color: var(--text); font-family: var(--font-mono); }
 
@@ -190,33 +146,24 @@
     display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;
   }
   .task-reward{ font-family: var(--font-mono); color: var(--primary); font-weight:600; font-size:14px; }
-
   .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; }
-  .pill-pending{ background: rgba(232,196,104,0.15); color: var(--gold); }
   .pill-approved{ background: var(--primary-soft); color: var(--primary); }
 
   .empty{ text-align:center; padding:50px 20px; color:var(--text-faint); }
   .empty svg{ margin-bottom:14px; opacity:0.5; }
 
-  /* ---------- Toast ---------- */
   .toast{
     position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:100;
     background: var(--surface-3); border:1px solid var(--line); color:var(--text);
     padding:13px 20px; border-radius:999px; font-size:14px; font-weight:500;
-    box-shadow: var(--shadow-lift); animation: dropIn .35s cubic-bezier(.2,.8,.2,1);
-    display:flex; align-items:center; gap:8px; max-width:90%;
+    box-shadow: var(--shadow-lift); display:flex; align-items:center; gap:8px; max-width:90%;
   }
-  @keyframes dropIn{ from{ opacity:0; transform: translate(-50%,-16px);} to{opacity:1; transform:translate(-50%,0);} }
-  .toast.success{ border-color: rgba(25,227,166,0.4); }
-  .toast.error{ border-color: rgba(255,122,122,0.4); }
-
   .spinner{
     width:18px; height:18px; border-radius:50%; border:2.5px solid rgba(255,255,255,0.25);
     border-top-color: currentColor; animation: spin .7s linear infinite; display:inline-block;
   }
   @keyframes spin{ to{ transform: rotate(360deg); } }
   .page-loader{ display:flex; align-items:center; justify-content:center; flex:1; min-height:60vh; color:var(--primary); }
-
   .section-title{ display:flex; align-items:center; justify-content:space-between; margin: 26px 0 14px; }
   .section-title h3{ font-size:16px; }
 </style>
@@ -226,68 +173,10 @@
 <div id="app"><div class="page-loader"><span class="spinner"></span></div></div>
 <div id="toast-root"></div>
 
-<script>
-  (function(){
-    window.__apexifyMounted = false;
-    function showFatal(msg){
-      var app = document.getElementById('app');
-      if(!app) return;
-      app.innerHTML = '<div style="padding:34px 24px;color:#EAF7F1;font-family:sans-serif;line-height:1.6;">'
-        + '<div style="font-weight:700;font-size:16px;margin-bottom:10px;">সাইট লোড হতে সমস্যা হচ্ছে</div>'
-        + '<div style="font-size:13px;color:#8FB6A9;word-break:break-word;">' + msg + '</div></div>';
-    }
-    window.__apexifyShowFatal = showFatal;
-    setTimeout(function(){
-      if(!window.__apexifyMounted){
-        showFatal('অ্যাপের মূল স্ক্রিপ্ট লোড হয়নি। ইন্টারনেট কানেকশন চেক করুন।');
-      }
-    }, 6000);
-  })();
-</script>
 <script type="module">
-async function loadFirebaseSDK(){
-  const sources = [
-    {
-      app: "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-      authUrl: "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
-      fsUrl: "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
-      name: "gstatic.com"
-    },
-    {
-      app: "https://esm.sh/firebase@10.12.2/app",
-      authUrl: "https://esm.sh/firebase@10.12.2/auth",
-      fsUrl: "https://esm.sh/firebase@10.12.2/firestore",
-      name: "esm.sh"
-    }
-  ];
-  for(const src of sources){
-    try{
-      const [appMod, authMod, fsMod] = await Promise.all([
-        import(/* @vite-ignore */ src.app),
-        import(/* @vite-ignore */ src.authUrl),
-        import(/* @vite-ignore */ src.fsUrl),
-      ]);
-      return { appMod, authMod, fsMod };
-    }catch(e){}
-  }
-  throw new Error('সব CDN থেকে Firebase লোড ব্যর্থ হয়েছে।');
-}
-
-let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    signOut, getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
-    orderBy, onSnapshot, serverTimestamp, increment, runTransaction;
-
-async function boot(){
-let sdk;
-try{
-  sdk = await loadFirebaseSDK();
-}catch(e){
-  window.__apexifyShowFatal && window.__apexifyShowFatal(e.message);
-  return;
-}
-({ initializeApp } = sdk.appMod);
-({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = sdk.authMod);
-({ getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, increment, runTransaction } = sdk.fsMod);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, increment, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
@@ -297,10 +186,10 @@ const firebaseConfig = {
   messagingSenderId: "114061131405",
   appId: "1:114061131405:web:ffd00b701d70c164976cc4"
 };
+
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
-window.__apexifyMounted = true;
 
 let state = {
   route: location.hash.replace('#','') || '/',
@@ -363,7 +252,6 @@ onAuthStateChanged(auth, async (user) => {
   render();
 });
 
-// Buy VIP Package & Daily Return Logic
 window.buyPackage = async function(pkgName, price, dailyReturn, durationDays) {
   if(!state.user) return setRoute('/login');
   if((state.profile?.balance || 0) < price) {
@@ -387,7 +275,7 @@ window.buyPackage = async function(pkgName, price, dailyReturn, durationDays) {
         dailyReturn: dailyReturn,
         daysLeft: durationDays,
         totalDays: durationDays,
-        lastClaimDate: new Date().toDateString(),
+        lastClaimDate: '',
         createdAt: serverTimestamp()
       });
     });
@@ -461,7 +349,7 @@ function render(){
     html = `
       <div class="screen" style="justify-content:center;">
         <div style="text-align:center; margin-bottom:30px;">
-          <div class="brand" style="justify-content:center; font-size:24px; margin-bottom:10px;"><div class="mark">A</div>Apexify</div>
+          <div style="font-size:24px; font-weight:700; margin-bottom:10px;">Apexify</div>
           <p style="color:var(--text-muted); font-size:14px;">আপনার অ্যাকাউন্টে লগইন করুন</p>
         </div>
         <div class="card card-glow">
@@ -471,4 +359,81 @@ function render(){
             <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">লগইন করুন</button>
           </form>
           <div style="text-align:center; margin-top:20px; font-size:13.5px; color:var(--text-muted);">
-            অ্যাকাউন্ট নেই? <a href="#/register" style="color
+            অ্যাকাউন্ট নেই? <a href="#/register" style="color:var(--primary); font-weight:600;">রেজিস্ট্রেশন করুন</a>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(r === '/register'){
+    html = `
+      <div class="screen" style="justify-content:center;">
+        <div style="text-align:center; margin-bottom:24px;">
+          <div style="font-size:24px; font-weight:700; margin-bottom:10px;">Apexify</div>
+          <p style="color:var(--text-muted); font-size:14px;">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+        </div>
+        <div class="card card-glow">
+          <form id="reg-form">
+            <div class="field"><label>আপনার নাম</label><input type="text" id="r-name" required placeholder="পূর্ণ নাম"></div>
+            <div class="field"><label>ইমেইল</label><input type="email" id="r-email" required placeholder="name@example.com"></div>
+            <div class="field"><label>পাসওয়ার্ড</label><input type="password" id="r-pass" required placeholder="কমপক্ষে ৬ ডিজিট"></div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">অ্যাকাউন্ট খুলুন</button>
+          </form>
+          <div style="text-align:center; margin-top:20px; font-size:13.5px; color:var(--text-muted);">
+            ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="#/login" style="color:var(--primary); font-weight:600;">লগইন করুন</a>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(r === '/packages'){
+    const bal = state.profile?.balance || 0;
+    html = `
+      <div class="screen">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>ভিআইপি প্যাকেজসমূহ</h2>
+          <div class="mono" style="color:var(--primary); font-weight:600;">ব্যালেন্স: ৳${bal}</div>
+        </div>
+
+        <div class="package-card">
+          <span class="eyebrow" style="color:var(--gold);">প্রিমিয়াম ইনভেস্টমেন্ট</span>
+          <h3 style="font-size:20px; margin:6px 0;">গোল্ডেন ভিআইপি প্ল্যান</h3>
+          <p style="font-size:13px; color:var(--text-muted);">প্যাকেজ কিনে প্রতিদিন নিশ্চিত রিটার্ন নিন!</p>
+          
+          <div class="package-features">
+            <div>মূল্য: <b>৳১,০০০</b></div>
+            <div>দৈনিক আয়: <b style="color:var(--primary);">৳৭৫০</b></div>
+            <div>মেয়াদ: <b>১৫ দিন</b></div>
+            <div>মোট রিটার্ন: <b style="color:var(--gold);">৳১১,২৫০</b></div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="buyPackage('Golden VIP Plan', 1000, 750, 15)">প্যাকেজটি কিনুন (৳১০০০)</button>
+        </div>
+
+        <div class="section-title"><h3>আমার সক্রিয় প্যাকেজসমূহ</h3></div>
+        ${state.myPackages.length === 0 ? `
+          <div class="empty">${ic.empty}<div>কোনো সক্রিয় প্যাকেজ নেই</div></div>
+        ` : state.myPackages.map(p => {
+          const today = new Date().toDateString();
+          const isCollected = p.lastClaimDate === today;
+          return `
+            <div class="card" style="margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h4 style="font-size:16px;">${p.name}</h4>
+                <span class="pill pill-approved">বাকি: ${p.daysLeft} দিন</span>
+              </div>
+              <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:12px;">দৈনিক প্রফিট: ৳${p.dailyReturn}</p>
+              <button class="btn ${isCollected ? 'btn-ghost' : 'btn-primary'} btn-sm btn-block" 
+                ${isCollected ? 'disabled' : ''} 
+                onclick="claimDailyProfit('${p.id}', '${p.lastClaimDate}', ${p.dailyReturn})">
+                ${isCollected ? 'আজকের প্রফিট সংগ্রহ করা হয়েছে' : 'আজকের প্রফিট নিন (৳৭৫০)'}
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else if(r === '/wallet'){
+    const bal = state.profile?.balance || 0;
+    html = `
+      <div class="screen">
+        <h2>ওয়ালেট</h2>
+        <div class="balance-card" style="margin:20px 0;">
+    
