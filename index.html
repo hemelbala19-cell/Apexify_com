@@ -242,6 +242,35 @@
 <div id="app"><div class="page-loader"><span class="spinner"></span></div></div>
 <div id="toast-root"></div>
 
+<script>
+  // Runs immediately, independent of the module script below, so we can show a
+  // real error message instead of an infinite spinner if anything upstream fails
+  // (blocked CDN, ad-blocker, bad Firebase config, offline, etc).
+  (function(){
+    window.__apexifyMounted = false;
+    function showFatal(msg){
+      var app = document.getElementById('app');
+      if(!app) return;
+      app.innerHTML = '<div style="padding:34px 24px;color:#EAF7F1;font-family:sans-serif;line-height:1.6;">'
+        + '<div style="font-weight:700;font-size:16px;margin-bottom:10px;">সাইট লোড হতে সমস্যা হচ্ছে</div>'
+        + '<div style="font-size:13px;color:#8FB6A9;word-break:break-word;">' + msg + '</div>'
+        + '<div style="font-size:12px;color:#5E8478;margin-top:16px;">Ad-blocker/VPN বন্ধ করে, ইন্টারনেট চেক করে আবার চেষ্টা করুন।</div>'
+        + '</div>';
+    }
+    window.__apexifyShowFatal = showFatal;
+    window.addEventListener('error', function(e){
+      if(!window.__apexifyMounted) showFatal('Error: ' + (e && e.message ? e.message : 'অজানা সমস্যা'));
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      if(!window.__apexifyMounted) showFatal('Error: ' + (e && e.reason && e.reason.message ? e.reason.message : String(e.reason)));
+    });
+    setTimeout(function(){
+      if(!window.__apexifyMounted){
+        showFatal('অ্যাপের মূল স্ক্রিপ্ট লোড হয়নি (Firebase CDN ব্লকড থাকতে পারে, বা নেটওয়ার্ক সমস্যা)।');
+      }
+    }, 6000);
+  })();
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -265,6 +294,7 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
+window.__apexifyMounted = true; // module + Firebase SDK loaded successfully
 
 /* ---------------- State ---------------- */
 let state = {
@@ -348,56 +378,15 @@ function attachAdminListeners(){
   }));
 }
 
-onAuthStateChanged(auth, async (u) => {
-  state.loading = false;
-  if (u) {
-    state.user = u;
-    const adminSnap = await getDoc(doc(db,'adminUsers', u.uid));
-    state.isAdmin = adminSnap.exists();
-    attachUserListeners(u.uid);
-    if (state.isAdmin) attachAdminListeners();
-    if (['/', '/login', '/register'].includes(state.route)) setRoute('/dashboard');
-  } else {
-    state.user = null; state.profile = null; state.isAdmin = false;
-    clearSubs();
-    if (!['/', '/login', '/register'].includes(state.route)) setRoute('/');
+// Safety net: if Firebase Auth never calls back (blocked network, offline preview,
+// misconfigured project, etc.) don't leave the user staring at a spinner forever.
+let authResolved = false;
+setTimeout(() => {
+  if (!authResolved) {
+    state.loading = false;
+    render();
+    toast('Firebase-এর সাথে সংযোগ করা যাচ্ছে না। ইন্টারনেট চেক করুন অথবা এই পেজটি একটি real domain/hosting-এ (Vercel ইত্যাদি) খুলে দেখুন — লোকাল ফাইল প্রিভিউ বা এই in-app viewer-এ Firebase কাজ নাও করতে পারে।', 'error');
   }
-  render();
-});
+}, 4000);
 
-/* ---------------- Auth actions ---------------- */
-async function doRegister(name, email, password){
-  try{
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: name });
-    await setDoc(doc(db,'users',cred.user.uid), {
-      name, email, createdAt: serverTimestamp(), balance: 0, totalEarned: 0, status: 'active'
-    });
-    toast('অ্যাকাউন্ট তৈরি হয়েছে, স্বাগতম!');
-  }catch(e){ toast(friendlyError(e), 'error'); }
-}
-async function doLogin(email, password){
-  try{ await signInWithEmailAndPassword(auth, email, password); }
-  catch(e){ toast(friendlyError(e), 'error'); }
-}
-async function doGoogle(){
-  try{
-    const cred = await signInWithPopup(auth, new GoogleAuthProvider());
-    const ref = doc(db,'users',cred.user.uid);
-    const snap = await getDoc(ref);
-    if(!snap.exists()){
-      await setDoc(ref, { name: cred.user.displayName||'User', email: cred.user.email, createdAt: serverTimestamp(), balance:0, totalEarned:0, status:'active' });
-    }
-  }catch(e){ toast(friendlyError(e), 'error'); }
-}
-async function doReset(email){
-  try{ await sendPasswordResetEmail(auth, email); toast('রিসেট লিংক ইমেইলে পাঠানো হয়েছে'); }
-  catch(e){ toast(friendlyError(e), 'error'); }
-}
-function friendlyError(e){
-  const map = {
-    'auth/email-already-in-use':'এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট আছে',
-    'auth/invalid-email':'সঠিক ইমেইল দিন',
-    'auth/weak-password':'পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার হতে হবে',
-    'auth/wrong-password':'পাসওয়ার্ড ভুল',
-    'auth/user-not-found':
+window.addEventListener('error', (e) 
