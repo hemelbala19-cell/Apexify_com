@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Apexify — Earn from real tasks</title>
+<title>Apexify — Earn from real tasks & VIP Packages</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -113,7 +113,6 @@
   /* ---------- Layout scaffolding ---------- */
   .screen{ flex:1; display:flex; flex-direction:column; padding: 28px 22px 100px; animation: rise .45s cubic-bezier(.2,.8,.2,1); }
   @keyframes rise{ from{ opacity:0; transform: translateY(14px);} to{opacity:1; transform:translateY(0);} }
-  .center-screen{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:28px 22px; }
 
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 18px 22px; }
   .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:19px; }
@@ -130,14 +129,13 @@
     box-shadow: 0 14px 40px rgba(0,0,0,0.4);
   }
   .navitem{
-    display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 10px; border-radius:12px;
-    color: var(--text-faint); font-size:10.5px; font-weight:600; transition: color .2s, transform .2s;
+    display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 8px; border-radius:12px;
+    color: var(--text-faint); font-size:10px; font-weight:600; transition: color .2s, transform .2s;
     background:none;
   }
   .navitem svg{ width:20px; height:20px; transition: transform .2s; }
   .navitem.active{ color: var(--primary); }
   .navitem.active svg{ transform: translateY(-2px); }
-  .navitem:active{ transform: scale(0.9); }
 
   /* ---------- Balance hero ---------- */
   .balance-card{
@@ -152,12 +150,41 @@
   .balance-amount{ font-family: var(--font-mono); font-size:38px; font-weight:600; letter-spacing:-0.01em; }
   .balance-amount .cents{ font-size:20px; color: var(--text-muted); }
 
-  /* ---------- Task cards ---------- */
+  /* ---------- Package / VIP Cards ---------- */
+  .package-card{
+    background: linear-gradient(145deg, #113D34 0%, #092621 100%);
+    border: 1px solid rgba(232,196,104,0.3);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .package-card::after{
+    content:'VIP';
+    position: absolute;
+    right: -20px;
+    top: -15px;
+    font-size: 60px;
+    font-weight: 900;
+    color: rgba(232,196,104,0.05);
+    font-family: var(--font-display);
+    pointer-events: none;
+  }
+  .package-features{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .package-features b{ color: var(--text); font-family: var(--font-mono); }
+
   .task-card{
     display:flex; align-items:center; gap:14px; padding:16px; border-radius:16px; background:var(--surface);
-    border:1px solid var(--line); margin-bottom:12px; transition: transform .15s, border-color .15s;
+    border:1px solid var(--line); margin-bottom:12px;
   }
-  .task-card:active{ transform: scale(0.98); }
   .task-icon{
     width:44px; height:44px; border-radius:12px; background: var(--primary-soft); color:var(--primary);
     display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px;
@@ -167,23 +194,9 @@
   .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; }
   .pill-pending{ background: rgba(232,196,104,0.15); color: var(--gold); }
   .pill-approved{ background: var(--primary-soft); color: var(--primary); }
-  .pill-rejected{ background: var(--danger-soft); color: var(--danger); }
 
   .empty{ text-align:center; padding:50px 20px; color:var(--text-faint); }
   .empty svg{ margin-bottom:14px; opacity:0.5; }
-
-  /* ---------- Modal ---------- */
-  .modal-backdrop{
-    position:fixed; inset:0; background: rgba(3,15,12,0.7); backdrop-filter: blur(4px); z-index:50;
-    display:flex; align-items:flex-end; justify-content:center; animation: fadeIn .25s;
-  }
-  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
-  .modal-sheet{
-    background: var(--bg-2); border:1px solid var(--line); border-radius: 24px 24px 0 0;
-    width:100%; max-width:480px; padding:26px 22px 34px; animation: slideUp .35s cubic-bezier(.2,.8,.2,1);
-    max-height:85vh; overflow-y:auto;
-  }
-  @keyframes slideUp{ from{ transform: translateY(100%);} to{ transform: translateY(0);} }
 
   /* ---------- Toast ---------- */
   .toast{
@@ -197,7 +210,6 @@
   .toast.success{ border-color: rgba(25,227,166,0.4); }
   .toast.error{ border-color: rgba(255,122,122,0.4); }
 
-  /* ---------- Loader ---------- */
   .spinner{
     width:18px; height:18px; border-radius:50%; border:2.5px solid rgba(255,255,255,0.25);
     border-top-color: currentColor; animation: spin .7s linear infinite; display:inline-block;
@@ -205,36 +217,8 @@
   @keyframes spin{ to{ transform: rotate(360deg); } }
   .page-loader{ display:flex; align-items:center; justify-content:center; flex:1; min-height:60vh; color:var(--primary); }
 
-  /* ---------- Landing ---------- */
-  .hero{ padding: 40px 22px 30px; }
-  .hero h1{ font-size:34px; line-height:1.12; margin: 18px 0 14px; }
-  .hero p{ color:var(--text-muted); font-size:15.5px; line-height:1.55; margin-bottom:26px; }
-  .stat-row{ display:flex; gap:12px; margin: 24px 0 8px; }
-  .stat{ flex:1; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; }
-  .stat .num{ font-family:var(--font-mono); font-size:20px; color:var(--primary); font-weight:600; }
-  .stat .lbl{ font-size:11px; color:var(--text-faint); margin-top:2px; }
-
-  .tabbar{ display:flex; background:var(--surface-2); border-radius:999px; padding:4px; margin-bottom:24px; }
-  .tabbar button{ flex:1; padding:11px; border-radius:999px; background:none; color:var(--text-faint); font-weight:600; font-size:14px; transition: all .2s; }
-  .tabbar button.active{ background: var(--primary); color:#04140F; }
-
   .section-title{ display:flex; align-items:center; justify-content:space-between; margin: 26px 0 14px; }
   .section-title h3{ font-size:16px; }
-  .section-title .link{ font-size:12.5px; color:var(--primary); font-weight:600; }
-
-  .list-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); }
-  .list-row:last-child{ border-bottom:none; }
-
-  .admin-badge{ background: linear-gradient(135deg,var(--gold),#C9A24E); color:#2A1F04; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; letter-spacing:0.04em; }
-
-  textarea{ width:100%; padding:14px 16px; background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); color:var(--text); font-size:14px; font-family:inherit; resize:vertical; min-height:80px;}
-  textarea:focus{ outline:none; border-color:var(--primary); }
-
-  .fab-admin{ position:fixed; bottom:100px; right:18px; z-index:15; }
-
-  @media (min-width:481px){
-    #app{ box-shadow: 0 0 60px rgba(0,0,0,0.5); }
-  }
 </style>
 </head>
 <body>
@@ -243,9 +227,6 @@
 <div id="toast-root"></div>
 
 <script>
-  // Runs immediately, independent of the module script below, so we can show a
-  // real error message instead of an infinite spinner if anything upstream fails
-  // (blocked CDN, ad-blocker, bad Firebase config, offline, etc).
   (function(){
     window.__apexifyMounted = false;
     function showFatal(msg){
@@ -253,20 +234,12 @@
       if(!app) return;
       app.innerHTML = '<div style="padding:34px 24px;color:#EAF7F1;font-family:sans-serif;line-height:1.6;">'
         + '<div style="font-weight:700;font-size:16px;margin-bottom:10px;">সাইট লোড হতে সমস্যা হচ্ছে</div>'
-        + '<div style="font-size:13px;color:#8FB6A9;word-break:break-word;">' + msg + '</div>'
-        + '<div style="font-size:12px;color:#5E8478;margin-top:16px;">Ad-blocker/VPN বন্ধ করে, ইন্টারনেট চেক করে আবার চেষ্টা করুন।</div>'
-        + '</div>';
+        + '<div style="font-size:13px;color:#8FB6A9;word-break:break-word;">' + msg + '</div></div>';
     }
     window.__apexifyShowFatal = showFatal;
-    window.addEventListener('error', function(e){
-      if(!window.__apexifyMounted) showFatal('Error: ' + (e && e.message ? e.message : 'অজানা সমস্যা'));
-    });
-    window.addEventListener('unhandledrejection', function(e){
-      if(!window.__apexifyMounted) showFatal('Error: ' + (e && e.reason && e.reason.message ? e.reason.message : String(e.reason)));
-    });
     setTimeout(function(){
       if(!window.__apexifyMounted){
-        showFatal('অ্যাপের মূল স্ক্রিপ্ট লোড হয়নি (Firebase CDN ব্লকড থাকতে পারে, বা নেটওয়ার্ক সমস্যা)।');
+        showFatal('অ্যাপের মূল স্ক্রিপ্ট লোড হয়নি। ইন্টারনেট কানেকশন চেক করুন।');
       }
     }, 6000);
   })();
@@ -285,15 +258,8 @@ async function loadFirebaseSDK(){
       authUrl: "https://esm.sh/firebase@10.12.2/auth",
       fsUrl: "https://esm.sh/firebase@10.12.2/firestore",
       name: "esm.sh"
-    },
-    {
-      app: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/app/+esm",
-      authUrl: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/auth/+esm",
-      fsUrl: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firestore/+esm",
-      name: "jsdelivr.net"
-    },
+    }
   ];
-  const errors = [];
   for(const src of sources){
     try{
       const [appMod, authMod, fsMod] = await Promise.all([
@@ -301,35 +267,27 @@ async function loadFirebaseSDK(){
         import(/* @vite-ignore */ src.authUrl),
         import(/* @vite-ignore */ src.fsUrl),
       ]);
-      console.log('Firebase SDK loaded from', src.name);
-      return { appMod, authMod, fsMod, source: src.name };
-    }catch(e){
-      console.error('Failed loading Firebase from', src.name, e);
-      errors.push(src.name + ': ' + (e && e.message ? e.message : e));
-    }
+      return { appMod, authMod, fsMod };
+    }catch(e){}
   }
-  throw new Error('সব CDN থেকে Firebase লোড ব্যর্থ হয়েছে — ' + errors.join(' | '));
+  throw new Error('সব CDN থেকে Firebase লোড ব্যর্থ হয়েছে।');
 }
 
 let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    GoogleAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, updateProfile,
-    getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
-    orderBy, onSnapshot, serverTimestamp, increment, runTransaction, limit;
+    signOut, getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
+    orderBy, onSnapshot, serverTimestamp, increment, runTransaction;
 
 async function boot(){
-
 let sdk;
 try{
   sdk = await loadFirebaseSDK();
 }catch(e){
-  window.__apexifyShowFatal && window.__apexifyShowFatal(e.message || String(e));
+  window.__apexifyShowFatal && window.__apexifyShowFatal(e.message);
   return;
 }
 ({ initializeApp } = sdk.appMod);
-({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-   GoogleAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, updateProfile } = sdk.authMod);
-({ getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
-   orderBy, onSnapshot, serverTimestamp, increment, runTransaction, limit } = sdk.fsMod);
+({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = sdk.authMod);
+({ getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, increment, runTransaction } = sdk.fsMod);
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
@@ -337,28 +295,19 @@ const firebaseConfig = {
   projectId: "apexify-72bc2",
   storageBucket: "apexify-72bc2.firebasestorage.app",
   messagingSenderId: "114061131405",
-  appId: "1:114061131405:web:ffd00b701d70c164976cc4",
-  measurementId: "G-RB6KW4S7JL"
+  appId: "1:114061131405:web:ffd00b701d70c164976cc4"
 };
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
-window.__apexifyMounted = true; // module + Firebase SDK loaded successfully
+window.__apexifyMounted = true;
 
-
-/* ---------------- State ---------------- */
 let state = {
   route: location.hash.replace('#','') || '/',
   user: null,
   profile: null,
-  isAdmin: false,
   tasks: [],
-  completions: [],
-  withdrawals: [],
-  notifications: [],
-  allUsers: [],
-  allWithdrawals: [],
-  allTasks: [],
+  myPackages: [],
   loading: true,
 };
 let unsubs = [];
@@ -375,22 +324,14 @@ function toast(msg, type='success'){
   setTimeout(() => el.remove(), 2800);
 }
 
-/* ---------------- Icons (inline SVG, stroke style) ---------------- */
 const ic = {
   home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>`,
   task: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/></svg>`,
+  package: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l9 4.5v11L12 22l-9-4.5v-11L12 2z"/><path d="M12 22v-11.5M3.5 6.5l8.5 5 8.5-5"/></svg>`,
   wallet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14" r="1.1" fill="currentColor" stroke="none"/></svg>`,
   profile: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"/></svg>`,
-  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
-  support: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.5a2.8 2.8 0 0 1 5.4.9c0 1.8-2.4 1.8-2.6 3.3M12 17.2h.01"/></svg>`,
-  arrowUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>`,
-  chevron: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>`,
-  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>`,
-  logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>`,
-  empty: `<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M8 15c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8"/></svg>`,
 };
 
-/* ---------------- Firestore live listeners ---------------- */
 function clearSubs(){ unsubs.forEach(u=>u()); unsubs=[]; }
 
 function attachUserListeners(uid){
@@ -399,4 +340,135 @@ function attachUserListeners(uid){
     state.profile = snap.exists() ? snap.data() : null;
     render();
   }));
-  unsubs.push(onSnapshot(query(collection(db,'tasks'), wh
+  unsubs.push(onSnapshot(query(collection(db,'users',uid,'myPackages')), (snap) => {
+    state.myPackages = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    render();
+  }));
+  unsubs.push(onSnapshot(collection(db,'tasks'), (snap) => {
+    state.tasks = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    render();
+  }));
+}
+
+onAuthStateChanged(auth, async (user) => {
+  state.user = user;
+  if(user){
+    attachUserListeners(user.uid);
+  } else {
+    clearSubs();
+    state.profile = null;
+    state.myPackages = [];
+  }
+  state.loading = false;
+  render();
+});
+
+// Buy VIP Package & Daily Return Logic
+window.buyPackage = async function(pkgName, price, dailyReturn, durationDays) {
+  if(!state.user) return setRoute('/login');
+  if((state.profile?.balance || 0) < price) {
+    return toast('পর্যাপ্ত ব্যালেন্স নেই! ডিপোজিট করুন।', 'error');
+  }
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const userRef = doc(db, 'users', state.user.uid);
+      const uSnap = await transaction.get(userRef);
+      const currentBal = uSnap.data().balance || 0;
+      
+      if(currentBal < price) throw new Error('অপর্যাপ্ত ব্যালেন্স!');
+
+      transaction.update(userRef, { balance: currentBal - price });
+
+      const newPkgRef = doc(collection(db, 'users', state.user.uid, 'myPackages'));
+      transaction.set(newPkgRef, {
+        name: pkgName,
+        price: price,
+        dailyReturn: dailyReturn,
+        daysLeft: durationDays,
+        totalDays: durationDays,
+        lastClaimDate: new Date().toDateString(),
+        createdAt: serverTimestamp()
+      });
+    });
+    toast('সফলভাবে প্যাকেজটি ক্রয় করা হয়েছে!');
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+};
+
+window.claimDailyProfit = async function(pkgId, lastClaim, dailyReturn) {
+  const today = new Date().toDateString();
+  if(lastClaim === today) {
+    return toast('আজকের প্রফিট ইতিমধ্যে সংগ্রহ করা হয়েছে!', 'error');
+  }
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const userRef = doc(db, 'users', state.user.uid);
+      const pkgRef = doc(db, 'users', state.user.uid, 'myPackages', pkgId);
+      
+      const uSnap = await transaction.get(userRef);
+      const pSnap = await transaction.get(pkgRef);
+
+      if(!pSnap.exists()) throw new Error('প্যাকেজটি পাওয়া যায়নি!');
+      const pData = pSnap.data();
+      if(pData.daysLeft <= 0) throw new Error('প্যাকেজের মেয়াদ শেষ!');
+
+      const currentBal = uSnap.data().balance || 0;
+
+      transaction.update(userRef, { balance: currentBal + dailyReturn });
+      transaction.update(pkgRef, {
+        daysLeft: pData.daysLeft - 1,
+        lastClaimDate: today
+      });
+    });
+    toast(`সফলভাবে ${dailyReturn} টাকা ব্যালেন্সে যোগ হলো!`);
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+};
+
+function renderBottomNav(){
+  if(!state.user || state.route === '/login' || state.route === '/register') return '';
+  return `
+    <nav class="bottomnav">
+      <button class="navitem ${state.route==='/'?'active':''}" onclick="location.hash='/'">${ic.home}হোম</button>
+      <button class="navitem ${state.route==='/packages'?'active':''}" onclick="location.hash='/packages'">${ic.package}ভিআইপি প্ল্যান</button>
+      <button class="navitem ${state.route==='/tasks'?'active':''}" onclick="location.hash='/tasks'">${ic.task}টাস্ক</button>
+      <button class="navitem ${state.route==='/wallet'?'active':''}" onclick="location.hash='/wallet'">${ic.wallet}ওয়ালেট</button>
+      <button class="navitem ${state.route==='/profile'?'active':''}" onclick="location.hash='/profile'">${ic.profile}প্রোফাইল</button>
+    </nav>
+  `;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.loading){
+    app.innerHTML = `<div class="page-loader"><span class="spinner"></span></div>`;
+    return;
+  }
+
+  let html = '';
+  const r = state.route;
+
+  if(!state.user && r !== '/login' && r !== '/register'){
+    setRoute('/login');
+    return;
+  }
+
+  if(r === '/login'){
+    html = `
+      <div class="screen" style="justify-content:center;">
+        <div style="text-align:center; margin-bottom:30px;">
+          <div class="brand" style="justify-content:center; font-size:24px; margin-bottom:10px;"><div class="mark">A</div>Apexify</div>
+          <p style="color:var(--text-muted); font-size:14px;">আপনার অ্যাকাউন্টে লগইন করুন</p>
+        </div>
+        <div class="card card-glow">
+          <form id="login-form">
+            <div class="field"><label>ইমেইল</label><input type="email" id="l-email" required placeholder="name@example.com"></div>
+            <div class="field"><label>পাসওয়ার্ড</label><input type="password" id="l-pass" required placeholder="••••••••"></div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">লগইন করুন</button>
+          </form>
+          <div style="text-align:center; margin-top:20px; font-size:13.5px; color:var(--text-muted);">
+            অ্যাকাউন্ট নেই? <a href="#/register" style="color
