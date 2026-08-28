@@ -272,15 +272,64 @@
   })();
 </script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  GoogleAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
-  orderBy, onSnapshot, serverTimestamp, increment, runTransaction, limit
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+async function loadFirebaseSDK(){
+  const sources = [
+    {
+      app: "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+      authUrl: "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+      fsUrl: "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+      name: "gstatic.com"
+    },
+    {
+      app: "https://esm.sh/firebase@10.12.2/app",
+      authUrl: "https://esm.sh/firebase@10.12.2/auth",
+      fsUrl: "https://esm.sh/firebase@10.12.2/firestore",
+      name: "esm.sh"
+    },
+    {
+      app: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/app/+esm",
+      authUrl: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/auth/+esm",
+      fsUrl: "https://cdn.jsdelivr.net/npm/firebase@10.12.2/firestore/+esm",
+      name: "jsdelivr.net"
+    },
+  ];
+  const errors = [];
+  for(const src of sources){
+    try{
+      const [appMod, authMod, fsMod] = await Promise.all([
+        import(/* @vite-ignore */ src.app),
+        import(/* @vite-ignore */ src.authUrl),
+        import(/* @vite-ignore */ src.fsUrl),
+      ]);
+      console.log('Firebase SDK loaded from', src.name);
+      return { appMod, authMod, fsMod, source: src.name };
+    }catch(e){
+      console.error('Failed loading Firebase from', src.name, e);
+      errors.push(src.name + ': ' + (e && e.message ? e.message : e));
+    }
+  }
+  throw new Error('সব CDN থেকে Firebase লোড ব্যর্থ হয়েছে — ' + errors.join(' | '));
+}
+
+let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    GoogleAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, updateProfile,
+    getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
+    orderBy, onSnapshot, serverTimestamp, increment, runTransaction, limit;
+
+async function boot(){
+
+let sdk;
+try{
+  sdk = await loadFirebaseSDK();
+}catch(e){
+  window.__apexifyShowFatal && window.__apexifyShowFatal(e.message || String(e));
+  return;
+}
+({ initializeApp } = sdk.appMod);
+({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+   GoogleAuthProvider, signInWithPopup, signOut, sendPasswordResetEmail, updateProfile } = sdk.authMod);
+({ getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where,
+   orderBy, onSnapshot, serverTimestamp, increment, runTransaction, limit } = sdk.fsMod);
 
 const firebaseConfig = {
   apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
@@ -295,6 +344,7 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 window.__apexifyMounted = true; // module + Firebase SDK loaded successfully
+
 
 /* ---------------- State ---------------- */
 let state = {
@@ -349,44 +399,4 @@ function attachUserListeners(uid){
     state.profile = snap.exists() ? snap.data() : null;
     render();
   }));
-  unsubs.push(onSnapshot(query(collection(db,'tasks'), where('active','==',true)), (snap)=>{
-    state.tasks = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-  unsubs.push(onSnapshot(query(collection(db,'taskCompletions'), where('userId','==',uid), orderBy('submittedAt','desc'), limit(50)), (snap)=>{
-    state.completions = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-  unsubs.push(onSnapshot(query(collection(db,'withdrawals'), where('userId','==',uid), orderBy('requestedAt','desc'), limit(50)), (snap)=>{
-    state.withdrawals = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-  unsubs.push(onSnapshot(query(collection(db,'notifications'), where('userId','==',uid), orderBy('createdAt','desc'), limit(30)), (snap)=>{
-    state.notifications = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-}
-
-function attachAdminListeners(){
-  unsubs.push(onSnapshot(query(collection(db,'withdrawals'), where('status','==','pending'), orderBy('requestedAt','desc')), (snap)=>{
-    state.allWithdrawals = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-  unsubs.push(onSnapshot(collection(db,'tasks'), (snap)=>{
-    state.allTasks = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    render();
-  }));
-}
-
-// Safety net: if Firebase Auth never calls back (blocked network, offline preview,
-// misconfigured project, etc.) don't leave the user staring at a spinner forever.
-let authResolved = false;
-setTimeout(() => {
-  if (!authResolved) {
-    state.loading = false;
-    render();
-    toast('Firebase-এর সাথে সংযোগ করা যাচ্ছে না। ইন্টারনেট চেক করুন অথবা এই পেজটি একটি real domain/hosting-এ (Vercel ইত্যাদি) খুলে দেখুন — লোকাল ফাইল প্রিভিউ বা এই in-app viewer-এ Firebase কাজ নাও করতে পারে।', 'error');
-  }
-}, 4000);
-
-window.addEventListener('error', (e) 
+  unsubs.push(onSnapshot(query(collection(db,'tasks'), wh
