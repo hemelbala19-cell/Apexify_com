@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Apexify Admin</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e7ebf2;--primary:#2563eb;--danger:#dc2626;--ok:#16a34a;--warn:#d97706}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial}
+button,input,select,textarea{font:inherit}button{border:0;cursor:pointer}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#eef4ff,#f8fafc)}
+.loginBox{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 20px 60px #0001}
+.logo{font-size:28px;font-weight:800;margin-bottom:6px}.sub{color:var(--muted);margin-bottom:22px}
+.field{margin:12px 0}.field label{display:block;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #d8dee9;border-radius:11px;background:#fff;outline:0}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary)}
+.primary{background:var(--primary);color:#fff;padding:12px 16px;border-radius:11px;font-weight:700}.danger{background:var(--danger);color:#fff}.ok{background:var(--ok);color:#fff}.ghost{background:#eef2f7;color:#263247}.small{padding:8px 10px;border-radius:9px;font-size:12px;font-weight:700}
+.error{color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;padding:10px;border-radius:10px;margin:12px 0}
+.app{display:flex;min-height:100vh}.side{width:250px;background:#111827;color:#fff;padding:18px;position:fixed;inset:0 auto 0 0;overflow:auto}.brand{font-size:22px;font-weight:800;padding:8px 10px 18px}.nav button{display:block;width:100%;text-align:left;background:transparent;color:#cbd5e1;padding:11px 12px;border-radius:10px;margin:3px 0}.nav button.active,.nav button:hover{background:#1f2937;color:#fff}.main{margin-left:250px;width:calc(100% - 250px);padding:20px;max-width:1600px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.top h1{margin:0;font-size:25px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px}.stat{font-size:26px;font-weight:800;margin-top:5px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.section{margin-top:16px}.section h2{font-size:18px;margin:0 0 10px}.tableWrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:760px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.table th{background:#f8fafc;font-size:12px;color:var(--muted)}.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;background:#eef2ff}.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}.pill.warn{background:#ffedd5;color:#9a3412}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:180px;padding:11px;border:1px solid #d8dee9;border-radius:10px}.btns{display:flex;gap:6px;flex-wrap:wrap}.empty{padding:30px;text-align:center;color:var(--muted)}.toast{position:fixed;right:18px;bottom:18px;z-index:20;background:#111827;color:#fff;padding:12px 15px;border-radius:11px;box-shadow:0 10px 30px #0003}.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:15px;z-index:10}.modalBox{width:min(800px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:18px}.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}.notice{padding:10px;background:#f8fafc;border-radius:10px;margin-top:8px}
+@media(max-width:900px){.side{width:72px;padding:10px}.brand{font-size:0}.brand:after{content:"A";font-size:24px}.nav button{font-size:0;text-align:center}.nav button:before{content:"•";font-size:22px}.main{margin-left:72px;width:calc(100% - 72px);padding:12px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:520px){.cards{grid-template-columns:1fr 1fr}.kv{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+  <div class="loginBox">
+    <div class="logo">🔥 Apexify Admin</div>
+    <div class="sub">Secure real-time control panel</div>
+    <div id="loginErr" class="error hidden"></div>
+    <div class="field"><label>Admin number</label><input id="phone" inputmode="numeric" value="01403594918" placeholder="01XXXXXXXXX"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" placeholder="Password"></div>
+    <button id="loginBtn" class="primary" style="width:100%">Login</button>
+    <p class="muted" style="font-size:12px;margin-top:14px">The number is converted internally to the Firebase Auth admin email. Password is never stored in this HTML.</p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="side">
+    <div class="brand">Apexify</div>
+    <div class="nav">
+      <button data-page="dashboard" class="active">📊 Dashboard</button>
+      <button data-page="deposits">🔥 Pending Deposit</button>
+      <button data-page="withdraws">💸 Pending Withdraw</button>
+      <button data-page="activations">🔐 Pending Activation</button>
+      <button data-page="users">👥 Users</button>
+      <button data-page="settings">⚙️ Settings</button>
+      <button data-page="tasks">📋 Tasks</button>
+      <button data-page="redeem">🎁 Redeem Codes</button>
+      <button data-page="notice">🔔 Notice</button>
+      <button data-page="audit">🧾 Audit Log</button>
+      <button id="logoutBtn">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top"><h1 id="pageTitle">Dashboard</h1><span id="adminName" class="muted"></span></div>
+    <div id="content"></div>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modalBox"><div class="modalHead"><h2 id="modalTitle" style="margin:0">User</h2><button class="small ghost" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+/*
+  IMPORTANT:
+  1) Replace FIREBASE_CONFIG below with the config from Firebase Console >
+     Project settings > Your apps > Web app.
+  2) Enable Authentication > Sign-in method > Email/Password.
+  3) Create an Auth user with:
+       email: 01403594918@apexify.com
+       password: srabon11
+     The admin enters only 01403594918 here.
+  4) After creating the Auth user, create Firestore document:
+       admins/{AUTH_UID}
+     fields:
+       active: true
+       name: "Apexify Admin"
+       phone: "01403594918"
+       role: "admin"
+  5) Your old admins document ID TZEKfb4rX2Or1RzDPLQI3ToSUXJ2 is not used
+     for authorization; recreate/copy it under the Firebase Auth UID.
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_MESSAGING_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const ADMIN_EMAIL_DOMAIN = "@apexify.com";
+const COL = {
+  admins:"admins", users:"users", deposits:"depositRequests",
+  withdraws:"withdrawRequests", activations:"activationRequests",
+  settings:"settings", tasks:"tasks", redeem:"redeemCodes",
+  notices:"notices", audit:"adminAuditLogs", transactions:"transactions"
+};
+const state={admin:null,unsubs:[],page:"dashboard",pending:{deposits:[],withdraws:[],activations:[]},users:[]};
+
+const $=id=>document.getElementById(id);
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+function err(msg){$("loginErr").textContent=msg;$("loginErr").classList.remove("hidden")}
+function emailForPhone(p){return p.replace(/\D/g,"")+ADMIN_EMAIL_DOMAIN}
+function money(v){return Number(v||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function statusPill(s){let x=String(s||"pending").toLowerCase();let c=x.includes("approv")||x==="active"?"ok":x.includes("reject")||x==="blocked"||x==="inactive"?"bad":"warn";return `<span class="pill ${c}">${esc(s||"pending")}</span>`}
+function closeModal(){$("modal").classList.add("hidden")}
+window.closeModal=closeModal;
+
+async function login(){
+  $("loginErr").classList.add("hidden");
+  try{
+    const phone=$("phone").value.trim();
+    const password=$("password").value;
+    const cred=await auth.signInWithEmailAndPassword(emailForPhone(phone),password);
+    const snap=await db.collection(COL.admins).doc(cred.user.uid).get();
+    if(!snap.exists || snap.data().active!==true || (snap.data().role||"admin")!=="admin"){
+      await auth.signOut(); throw new Error("This account is not an active Apexify admin.");
+    }
+    state.admin={uid:cred.user.uid,...snap.data()};
+    $("login").classList.add("hidden");$("app").classList.remove("hidden");
+    $("adminName").textContent=state.admin.name||phone;
+    await startRealtime();
+    showPage("dashboard");
+  }catch(e){err(e.message||"Login failed")}
+}
+$("loginBtn").onclick=login;
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+$("logoutBtn").onclick=()=>auth.signOut();
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){state.unsubs.forEach(u=>u&&u());state.unsubs=[];$("app").classList.add("hidden");$("login").classList.remove("hidden")}
+});
+
+async function audit(action,details={}){
+  if(!state.admin)return;
+  await db.collection(COL.audit).add({adminUid:state.admin.uid,adminName:state.admin.name||"",action,details,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
+
+function listen(col,cb,queryFn){
+  let q=db.collection(col); if(queryFn)q=queryFn(q);
+  return q.onSnapshot(s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))),e=>console.error(col,e));
+}
+async function startRealtime(){
+  state.unsubs.forEach(u=>u&&u());state.unsubs=[];
+  state.unsubs.push(listen(COL.deposits,rows=>{state.pending.deposits=rows.filter(x=>String(x.status||"pending").toLowerCase()==="pending");refreshIf("deposits")},q=>q.orderBy("createdAt","desc").limit(100)));
+  state.unsubs.push(listen(COL.withdraws,rows=>{state.pending.withdraws=rows.filter(x=>String(x.status||"pending").toLowerCase()==="pending");refreshIf("withdraws")},q=>q.orderBy("createdAt","desc").limit(100)));
+  state.unsubs.push(listen(COL.activations,rows=>{state.pending.activations=rows.filter(x=>String(x.status||"pending").toLowerCase()==="pending");refreshIf("activations")},q=>q.orderBy("createdAt","desc").limit(100)));
+}
+function refreshIf(p){if(state.page===p)renderPage(p)}
+
+function showPage(p){
+  state.page=p;
+  document.querySelectorAll(".nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===p));
+  const titles={dashboard:"Dashboard",deposits:"Pending Deposit",withdraws:"Pending Withdraw",activations:"Pending Activation",users:"Users",settings:"Settings",tasks:"Task Control",redeem:"Redeem Codes",notice:"Notice / Notification",audit:"Admin Audit Log"};
+  $("pageTitle").textContent=titles[p]||p; renderPage(p);
+}
+document.querySelectorAll(".nav button[data-page]").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+
+async function renderPage(p){
+  if(p==="dashboard")return renderDashboard();
+  if(p==="deposits")return renderRequests("deposits");
+  if(p==="withdraws")return renderRequests("withdraws");
+  if(p==="activations")return renderRequests("activations");
+  if(p==="users")return renderUsers();
+  if(p==="settings")return renderSettings();
+  if(p==="tasks")return renderTasks();
+  if(p==="redeem")return renderRedeem();
+  if(p==="notice")return renderNotice();
+  if(p==="audit")return renderAudit();
+}
+
+function renderDashboard(){
+  const d=state.pending.deposits.length,w=state.pending.withdraws.length,a=state.pending.activations.length;
+  $("content").innerHTML=`<div class="cards">
+    <div class="card">🔥 Pending Deposits<div class="stat">${d}</div></div>
+    <div class="card">💸 Pending Withdraws<div class="stat">${w}</div></div>
+    <div class="card">🔐 Pending Activations<div class="stat">${a}</div></div>
+    <div class="card">🟢 Admin Status<div class="stat" style="font-size:18px">LIVE</div></div>
+  </div>
+  <div class="section"><div class="grid">
+    <div class="card"><h2>Quick control</h2><div class="btns">
+      <button class="small primary" onclick="showPage('deposits')">Deposits</button>
+      <button class="small primary" onclick="showPage('withdraws')">Withdraws</button>
+      <button class="small primary" onclick="showPage('activations')">Activations</button>
+      <button class="small ghost" onclick="showPage('users')">Search users</button>
+    </div></div>
+    <div class="card"><h2>Realtime</h2><p class="muted">Pending request listeners are active. Changes made in Firestore appear automatically.</p></div>
+  </div></div>`;
+}
+
+function rowValue(x,keys){for(const k of keys){if(x[k]!==undefined&&x[k]!==null&&x[k]!=="")return x[k]}return ""}
+function requestRows(type){
+  const rows=state.pending[type]||[];
+  return rows.map(x=>{
+    const uid=rowValue(x,["uid","userId","userID"]);
+    const amount=rowValue(x,["amount","money","value"]);
+    const method=rowValue(x,["method","paymentMethod"]);
+    const trx=rowValue(x,["transactionId","trxId","trx","reference"]);
+    const number=rowValue(x,["senderNumber","receiverNumber","number","phone"]);
+    const date=x.createdAt?.toDate?x.createdAt.toDate().toLocaleString():String(x.createdAt||"");
+    return `<tr><td>${esc(x.id)}</td><td>${esc(uid)}</td><td><b>${money(amount)}</b></td><td>${esc(method)}</td><td>${esc(number)}</td><td>${esc(trx)}</td><td>${esc(date)}</td>
+      <td><div class="btns"><button class="small ok" onclick="processRequest('${type}','${esc(x.id)}','approved')">Approve</button><button class="small danger" onclick="processRequest('${type}','${esc(x.id)}','rejected')">Reject</button></div></td></tr>`
+  }).join("");
+}
+function renderRequests(type){
+  const title=type==="deposits"?"🔥 Deposit":type==="withdraws"?"💸 Withdraw":"🔐 Activation";
+  const rows=requestRows(type);
+  $("content").innerHTML=`<div class="card"><h2>${title} — Pending: ${state.pending[type].length}</h2>
+    <div class="tableWrap"><table class="table"><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>Number</th><th>TRX</th><th>Time</th><th>Action</th></tr></thead>
+    <tbody>${rows||`<tr><td colspan="8" class="empty">No pending requests</td></tr>`}</tbody></table></div></div>`;
+}
+window.processRequest=async(type,id,newStatus)=>{
+  if(!confirm(`Set this request to ${newStatus}?`))return;
+  const col=COL[type], ref=db.collection(col).doc(id);
+  await db.runTransaction(async tx=>{
+    const snap=await tx.get(ref);if(!snap.exists)throw new Error("Request not found");
+    const x=snap.data();const old=String(x.status||"pending").toLowerCase();
+    if(old!=="pending")throw new Error("This request was already processed.");
+    tx.update(ref,{status:newStatus,processedAt:firebase.firestore.FieldValue.serverTimestamp(),processedBy:state.admin.uid});
+    const uid=rowValue(x,["uid","userId","userID"]);
+    const amount=Number(rowValue(x,["amount","money","value"])||0);
+    if(newStatus==="approved"&&uid&&amount){
+      const uref=db.collection(COL.users).doc(uid);const us=await tx.get(uref);
+      if(us.exists){
+        const u=us.data();let field=null;
+        if(type==="deposits")field="depositBalance";
+        if(type==="withdraws")field="mainBalance";
+        if(type==="activations")field="mainBalance";
+        if(field)tx.update(uref,{[field]:Number(u[field]||0)+(type==="withdraws"?-amount:amount)});
+      }
+    }
+  });
+  await audit(type+"_"+newStatus,{requestId:id});toast("Updated successfully");
+};
+
+async function renderUsers(){
+  $("content").innerHTML=`<div class="card"><h2>👥 User Search</h2><div class="toolbar"><input id="userSearch" placeholder="UID / phone / email / name"><button class="primary" onclick="searchUsers()">Search</button></div><div id="userResults" class="empty">Enter a user identifier.</div></div>`;
+}
+window.searchUsers=async()=>{
+  const term=$("userSearch").value.trim();if(!term)return;
+  $("userResults").innerHTML="Searching…";
+  const out=[];const fields=["uid","phone","email","name","username"];
+  for(const f of fields){try{const s=await db.collection(COL.users).where(f,"==",term).limit(20).get();s.forEach(d=>out.push({id:d.id,...d.data()}))}catch(e){}}
+  if(!out.some(x=>x.id===term)){try{const s=await db.collection(COL.users).doc(term).get();if(s.exists)out.push({id:s.id,...s.data()})}catch(e){}}
+  const uniq=[...new Map(out.map(x=>[x.id,x])).values()];
+  $("userResults").innerHTML=uniq.length?`<div class="tableWrap"><table class="table"><thead><tr><th>UID</th><th>Name</th><th>Phone</th><th>Status</th><th>Main</th><th>Deposit</th><th>Referral</th><th>Salary</th><th></th></tr></thead><tbody>${uniq.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.name||x.username)}</td><td>${esc(x.phone)}</td><td>${statusPill(x.status||"active")}</td><td>${money(x.mainBalance)}</td><td>${money(x.depositBalance)}</td><td>${money(x.referralBalance)}</td><td>${money(x.salaryBalance)}</td><td><button class="small primary" onclick="openUser('${esc(x.id)}')">Details</button></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No user found.</div>`;
+};
+window.openUser=async(uid)=>{
+  const s=await db.collection(COL.users).doc(uid).get();if(!s.exists)return toast("User not found");const u=s.data();
+  $("modalTitle").textContent="User: "+uid;
+  $("modalBody").innerHTML=`<div class="grid">
+    <div class="field"><label>Name</label><input id="u_name" value="${esc(u.name||"")}"></div>
+    <div class="field"><label>Phone</label><input id="u_phone" value="${esc(u.phone||"")}"></div>
+    <div class="field"><label>Status</label><select id="u_status"><option ${u.status==="active"?"selected":""}>active</option><option ${u.status==="inactive"?"selected":""}>inactive</option><option ${u.status==="blocked"?"selected":""}>blocked</option></select></div>
+    <div class="field"><label>Main Balance</label><input id="u_main" type="number" step="0.01" value="${Number(u.mainBalance||0)}"></div>
+    <div class="field"><label>Deposit Balance</label><input id="u_deposit" type="number" step="0.01" value="${Number(u.depositBalance||0)}"></div>
+    <div class="field"><label>Referral Balance</label><input id="u_ref" type="number" step="0.01" value="${Number(u.referralBalance||0)}"></div>
+    <div class="field"><label>Salary Balance</label><input id="u_salary" type="number" step="0.01" value="${Number(u.salaryBalance||0)}"></div>
+  </div>
+  <div class="btns"><button class="primary" onclick="saveUser('${esc(uid)}')">Save User</button><button class="ghost" onclick="showReferral('${esc(uid)}')">Referral Network</button><button class="ghost" onclick="showTransactions('${esc(uid)}')">Transaction History</button></div>`;
+  $("modal").classList.remove("hidden");
+};
+window.saveUser=async uid=>{
+  const ref=db.collection(COL.users).doc(uid);const before=await ref.get();
+  const data={name:$("u_name").value.trim(),phone:$("u_phone").value.trim(),status:$("u_status").value,mainBalance:Number($("u_main").value||0),depositBalance:Number($("u_deposit").value||0),referralBalance:Number($("u_ref").value||0),salaryBalance:Number($("u_salary").value||0),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  await ref.set(data,{merge:true});await audit("user_update",{uid,changes:data});toast("User updated");
+};
+window.showTransactions=async uid=>{
+  const s=await db.collection(COL.transactions).where("uid","==",uid).orderBy("createdAt","desc").limit(50).get().catch(()=>null);
+  const rows=s?s.docs.map(d=>({id:d.id,...d.data()})):[];
+  $("modalTitle").textContent="Transaction History";
+  $("modalBody").innerHTML=rows.length?`<div class="tableWrap"><table class="table"><thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.type||x.method)}</td><td>${money(x.amount)}</td><td>${statusPill(x.status)}</td><td>${esc(x.createdAt?.toDate?x.createdAt.toDate().toLocaleString():x.createdAt)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No transactions found in transactions/{doc}.</div>`;
+};
+window.showReferral=async uid=>{
+  const qs=await db.collection(COL.users).where("referredBy","==",uid).limit(100).get().catch(()=>null);
+  const rows=qs?qs.docs.map(d=>({id:d.id,...d.data()})):[];
+  $("modalTitle").textContent="Referral Network";
+  $("modalBody").innerHTML=rows.length?`<div class="tableWrap"><table class="table"><thead><tr><th>UID</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${statusPill(x.status)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No direct referrals found using referredBy.</div>`;
+};
+
+async function getSettings(){
+  const s=await db.collection(COL.settings).doc("main").get();return s.exists?s.data():{};
+}
+async function renderSettings(){
+  const x=await getSettings();
+  $("content").innerHTML=`<div class="grid">
+  <div class="card"><h2>💰 Money & Referral</h2>
+    ${settingInput("activationFee","Activation Fee",x.activationFee)}
+    ${settingInput("referralReward","Per Referral",x.referralReward)}
+    ${settingInput("depositMin","Deposit Min",x.depositMin)}
+    ${settingInput("depositMax","Deposit Max",x.depositMax)}
+    ${settingInput("withdrawFee","Withdraw Fee",x.withdrawFee)}
+    ${settingInput("withdrawMin","Withdraw Min",x.withdrawMin)}
+    ${settingInput("withdrawMax","Withdraw Max",x.withdrawMax)}
+  </div>
+  <div class="card"><h2>💼 Salary</h2>${settingInput("salaryReward","Salary Reward",x.salaryReward)}${settingInput("salaryMin","Salary Minimum",x.salaryMin)}${settingInput("salaryCycle","Salary Cycle",x.salaryCycle)}</div>
+  <div class="card"><h2>📱 Payment Numbers</h2>${settingInput("bkash","bKash Number",x.bkash)}${settingInput("nagad","Nagad Number",x.nagad)}${settingInput("rocket","Rocket Number",x.rocket)}${settingInput("upay","Upay Number",x.upay)}</div>
+  <div class="card"><h2>🔘 Services</h2>${["deposit","withdraw","activation","tasks","referral","salary","redeem"].map(k=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><b>${k}</b><input type="checkbox" id="s_${k}" ${x["service_"+k]!==false?"checked":""}></div>`).join("")}<div style="margin-top:12px"><label><input type="checkbox" id="maintenance" ${x.maintenance===true?"checked":""}> 🛠️ Maintenance mode</label></div></div>
+  </div><div class="section"><button class="primary" onclick="saveSettings()">Save Settings</button></div>`;
+}
+function settingInput(id,label,v){return `<div class="field"><label>${label}</label><input id="s_${id}" value="${esc(v??"")}"></div>`}
+window.saveSettings=async()=>{
+  const ids=["activationFee","referralReward","depositMin","depositMax","withdrawFee","withdrawMin","withdrawMax","salaryReward","salaryMin","salaryCycle","bkash","nagad","rocket","upay"];
+  const data={};ids.forEach(id=>data[id]=$("s_"+id).value);
+  ["deposit","withdraw","activation","tasks","referral","salary","redeem"].forEach(k=>data["service_"+k]=$("s_"+k).checked);
+  data.maintenance=$("maintenance").checked;data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  await db.collection(COL.settings).doc("main").set(data,{merge:true});await audit("settings_update",data);toast("Settings saved");
+};
+
+async function renderTasks(){
+  const s=await db.collection(COL.tasks).orderBy("createdAt","desc").limit(100).get().catch(()=>null);const rows=s?s.docs.map(d=>({id:d.id,...d.data()})):[];
+  $("content").innerHTML=`<div class="card"><h2>📋 Task Control</h2><div class="toolbar"><button class="primary" onclick="addTask()">+ Add Task</button></div><div class="tableWrap"><table class="table"><thead><tr><th>Title</th><th>Reward</th><th>Active</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.title||x.name)}</td><td>${money(x.reward)}</td><td>${statusPill(x.active===false?"inactive":"active")}</td><td><button class="small ghost" onclick="toggleTask('${x.id}',${x.active===false})">Toggle</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">No tasks</td></tr>`}</tbody></table></div></div>`;
+}
+window.addTask=async()=>{const title=prompt("Task title?");if(!title)return;const reward=Number(prompt("Task reward?", "1")||0);await db.collection(COL.tasks).add({title,reward,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await audit("task_create",{title,reward});renderTasks()};
+window.toggleTask=async(id,v)=>{await db.collection(COL.tasks).doc(id).set({active:v,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});await audit("task_toggle",{id,active:v});renderTasks()};
+
+async function renderRedeem(){
+  const s=await db.collection(COL.redeem).orderBy("createdAt","desc").limit(100).get().catch(()=>null);const rows=s?s.docs.map(d=>({id:d.id,...d.data()})):[];
+  $("content").innerHTML=`<div class="card"><h2>🎁 Redeem Codes</h2><div class="toolbar"><button class="primary" onclick="addRedeem()">+ Create Code</button></div><div class="tableWrap"><table class="table"><thead><tr><th>Code</th><th>Reward</th><th>Limit</th><th>Active</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.code||x.id)}</td><td>${money(x.reward)}</td><td>${esc(x.limit??"")}</td><td>${statusPill(x.active===false?"inactive":"active")}</td></tr>`).join("")||`<tr><td colspan="4" class="empty">No redeem codes</td></tr>`}</tbody></table></div></div>`;
+}
+window.addRedeem=async()=>{const code=prompt("Redeem code?");if(!code)return;const reward=Number(prompt("Reward?", "1")||0);const limit=Number(prompt("Use limit?", "1")||0);await db.collection(COL.redeem).doc(code.trim()).set({code:code.trim(),reward,limit,used:0,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await audit("redeem_create",{code,reward,limit});renderRedeem()};
+
+async function renderNotice(){
+  $("content").innerHTML=`<div class="grid"><div class="card"><h2>🔔 Publish Notice</h2><div class="field"><label>Title</label><input id="n_title"></div><div class="field"><label>Message</label><textarea id="n_body" rows="6"></textarea></div><button class="primary" onclick="publishNotice()">Publish</button></div><div class="card"><h2>Service Notice</h2><p class="muted">Notices are saved to <b>notices</b> and can be read by your website from Firestore.</p></div></div>`;
+}
+window.publishNotice=async()=>{const title=$("n_title").value.trim(),body=$("n_body").value.trim();if(!body)return;await db.collection(COL.notices).add({title,body,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:state.admin.uid});await audit("notice_create",{title});toast("Notice published");$("n_title").value="";$("n_body").value=""};
+
+async function renderAudit(){
+  const s=await db.collection(COL.audit).orderBy("createdAt","desc").limit(100).get().catch(()=>null);const rows=s?s.docs.map(d=>({id:d.id,...d.data()})):[];
+  $("content").innerHTML=`<div class="card"><h2>🧾 Admin Audit Log</h2><div class="tableWrap"><table class="table"><thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Details</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.createdAt?.toDate?x.createdAt.toDate().toLocaleString():x.createdAt)}</td><td>${esc(x.adminName||x.adminUid)}</td><td>${esc(x.action)}</td><td><pre style="white-space:pre-wrap;margin:0">${esc(JSON.stringify(x.details||{}))}</pre></td></tr>`).join("")||`<tr><td colspan="4" class="empty">No audit logs</td></tr>`}</tbody></table></div></div>`;
+}
+</script>
+</body>
+</html>
