@@ -1,0 +1,2488 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Apexify — Admin Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070F0D;
+    --panel:#0B1714;
+    --panel-2:#0F1E1A;
+    --card:rgba(255,255,255,.035);
+    --card-brd:rgba(255,255,255,.07);
+    --line:rgba(255,255,255,.08);
+    --emerald:#17D9A3;
+    --emerald-dim:#0E7C5E;
+    --gold:#E8B858;
+    --text:#EAF6F1;
+    --mute:#7FA598;
+    --mute-2:#547569;
+    --danger:#FF6767;
+    --danger-soft:rgba(255,103,103,.12);
+    --warn:#F0B94E;
+    --warn-soft:rgba(240,185,78,.12);
+    --ok:#2FE3A6;
+    --ok-soft:rgba(47,227,166,.12);
+    --radius:18px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif;
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(23,217,163,.10), transparent 45%),
+      radial-gradient(circle at 100% 20%, rgba(232,184,88,.06), transparent 40%);
+    background-attachment:fixed;
+  }
+  h1,h2,h3,.display{font-family:'Manrope',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  ::-webkit-scrollbar{width:8px; height:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:8px;}
+  button{font-family:inherit; cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  .hidden{display:none !important;}
+  a{color:inherit;}
+
+  /* ============ LOGIN ============ */
+  #login-screen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; overflow:hidden;
+  }
+  #login-screen::before{
+    content:''; position:absolute; inset:-20%; background:
+      radial-gradient(circle at 30% 30%, rgba(23,217,163,.14), transparent 55%),
+      radial-gradient(circle at 75% 70%, rgba(232,184,88,.10), transparent 50%);
+    filter:blur(40px); pointer-events:none;
+  }
+  .login-card{
+    position:relative; width:100%; max-width:392px; background:linear-gradient(165deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+    border:1px solid var(--card-brd); border-radius:24px; padding:38px 30px 32px; backdrop-filter:blur(18px);
+    box-shadow:0 30px 60px rgba(0,0,0,.45);
+  }
+  .brand-mark{width:52px; height:52px; border-radius:16px; background:linear-gradient(135deg,var(--emerald),var(--emerald-dim)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; font-family:'Manrope'; color:#04120D; margin-bottom:18px; box-shadow:0 10px 24px rgba(23,217,163,.35);}
+  .login-eyebrow{display:flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:1.5px; color:var(--gold); text-transform:uppercase; margin-bottom:10px;}
+  .pulse-dot{width:6px; height:6px; border-radius:50%; background:var(--emerald); box-shadow:0 0 0 0 rgba(23,217,163,.6); animation:pulse 2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(23,217,163,.55);}70%{box-shadow:0 0 0 8px rgba(23,217,163,0);}100%{box-shadow:0 0 0 0 rgba(23,217,163,0);}}
+  .login-title{font-size:25px; font-weight:800; margin:0 0 6px;}
+  .login-sub{color:var(--mute); font-size:13.5px; margin:0 0 26px; line-height:1.5;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:11.5px; font-weight:700; color:var(--mute); margin-bottom:7px; letter-spacing:.3px; text-transform:uppercase;}
+  .field-input{
+    display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.03); border:1.5px solid var(--line);
+    border-radius:13px; padding:13px 15px; transition:border-color .15s;
+  }
+  .field-input:focus-within{border-color:var(--emerald);}
+  .field-input input,.field-input select{border:none; outline:none; flex:1; font-size:14.5px; background:transparent; color:var(--text);}
+  .field-input svg{flex-shrink:0; color:var(--mute-2);}
+  .eye-toggle{background:none; border:none; padding:2px; display:flex; color:var(--mute-2);}
+  .btn{border:none; border-radius:13px; padding:14px 20px; font-weight:700; font-size:14.5px; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .18s cubic-bezier(.34,1.56,.64,1), opacity .12s, filter .15s, box-shadow .2s; position:relative; overflow:hidden;}
+  .btn:active{transform:scale(.94);}
+  .btn:disabled{opacity:.45; pointer-events:none;}
+  .btn-primary{background:linear-gradient(135deg,var(--emerald),var(--emerald-dim)); color:#04140F; box-shadow:0 10px 22px rgba(23,217,163,.25); isolation:isolate;}
+  .btn-primary::before{
+    content:''; position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.4) 45%, transparent 60%);
+    transform:translateX(-120%); transition:transform .6s ease;
+  }
+  .btn-primary:hover::before{transform:translateX(120%);}
+  .btn-primary:hover{filter:brightness(1.08); box-shadow:0 12px 26px rgba(23,217,163,.32); transform:translateY(-1px);}
+  .btn-primary:active{transform:scale(.94) translateY(0);}
+  .btn-ghost{background:rgba(255,255,255,.05); color:var(--text); border:1px solid var(--line); transition:all .15s ease;}
+  .btn-ghost:hover{border-color:var(--emerald); background:rgba(23,217,163,.08);}
+  .btn-danger{background:var(--danger-soft); color:var(--danger); border:1px solid rgba(255,103,103,.3); transition:all .15s ease;}
+  .btn-danger:hover{background:rgba(255,103,103,.2);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:8px 14px; font-size:12.5px; border-radius:10px;}
+  .err-msg{color:var(--danger); font-size:12.5px; font-weight:600; margin-top:10px; min-height:14px; text-align:center;}
+  .login-foot{margin-top:22px; text-align:center; font-size:11.5px; color:var(--mute-2); line-height:1.6;}
+
+  /* ============ APP SHELL ============ */
+  #app-shell{display:flex; min-height:100vh;}
+  #sidebar{
+    width:252px; flex-shrink:0; background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border-right:1px solid var(--line); display:flex; flex-direction:column; padding:22px 16px;
+    position:fixed; top:0; bottom:0; left:0; z-index:50; transition:transform .25s ease;
+  }
+  #sidebar::before{content:''; position:absolute; top:0; left:0; bottom:0; width:2px; background:linear-gradient(180deg, var(--emerald), transparent 60%);}
+  .sb-brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px;}
+  .sb-brand .mark{width:36px; height:36px; border-radius:11px; background:linear-gradient(135deg,var(--emerald),var(--emerald-dim)); display:flex; align-items:center; justify-content:center; font-weight:800; color:#04140F; font-family:'Manrope';}
+  .sb-brand .txt b{display:block; font-size:15px; font-weight:800;}
+  .sb-brand .txt span{font-size:10px; color:var(--gold); letter-spacing:1.5px; font-weight:700;}
+  .sb-nav{display:flex; flex-direction:column; gap:3px; flex:1; overflow-y:auto;}
+  .sb-link{
+    display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; color:var(--mute);
+    font-size:13.5px; font-weight:600; background:none; border:none; text-align:left; width:100%; position:relative;
+    transition:transform .12s ease, background .15s ease, color .15s ease;
+  }
+  .sb-link:active{transform:scale(0.97);}
+  .sb-link svg{flex-shrink:0; opacity:.8;}
+  .sb-link .cnt{margin-left:auto; font-size:10.5px; font-weight:800; background:var(--danger-soft); color:var(--danger); padding:2px 7px; border-radius:99px;}
+  .sb-link:hover{background:rgba(255,255,255,.04); color:var(--text);}
+  .sb-link.active{background:rgba(23,217,163,.1); color:var(--emerald);}
+  .sb-link.active svg{opacity:1;}
+  .sb-foot{border-top:1px solid var(--line); padding-top:14px; margin-top:10px;}
+  .admin-chip{display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; background:rgba(255,255,255,.03); margin-bottom:8px;}
+  .admin-chip .av{width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--gold),#B8863A); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:#251A06; flex-shrink:0;}
+  .admin-chip .info{overflow:hidden;}
+  .admin-chip .info b{display:block; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .admin-chip .info span{font-size:10px; color:var(--mute-2);}
+
+  #main{flex:1; margin-left:252px; min-height:100vh; display:flex; flex-direction:column;}
+  #topbar{
+    position:sticky; top:0; z-index:30; background:rgba(7,15,13,.85); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line); padding:16px 28px; display:flex; align-items:center; gap:16px;
+  }
+  .hamburger{display:none; width:38px; height:38px; border-radius:10px; background:var(--card); border:1px solid var(--line); align-items:center; justify-content:center; color:var(--text); flex-shrink:0;}
+  .page-heading{font-size:19px; font-weight:800; margin:0;}
+  .page-sub{font-size:12px; color:var(--mute); margin-top:2px;}
+  .top-search{flex:1; max-width:340px; margin-left:auto;}
+  .top-search .field-input{padding:10px 14px;}
+  .icon-btn{width:38px; height:38px; border-radius:11px; background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--text); flex-shrink:0; transition:transform .15s cubic-bezier(.34,1.56,.64,1), border-color .15s ease, color .15s ease;}
+  .icon-btn:active{transform:scale(0.88);}
+  .icon-btn:hover{border-color:var(--emerald); color:var(--emerald);}
+
+  #content{padding:24px 28px 60px; flex:1;}
+  .page{display:none;}
+  .page.active{display:block; animation:fadein .3s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* KPI cards */
+  .kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
+  .kpi-card{
+    background:linear-gradient(160deg, rgba(255,255,255,.045), rgba(255,255,255,.01)); border:1px solid var(--card-brd);
+    border-radius:var(--radius); padding:18px; position:relative; overflow:hidden;
+  }
+  .kpi-card::before{content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent-line, var(--emerald));}
+  .kpi-card .lbl{font-size:11.5px; color:var(--mute); font-weight:600; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .kpi-card .val{font-size:26px; font-weight:800; font-family:'Manrope';}
+  .kpi-card .sub{font-size:11px; color:var(--mute-2); margin-top:4px;}
+  .kpi-ic{width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center;}
+
+  /* Cards / sections */
+  .panel{background:var(--card); border:1px solid var(--card-brd); border-radius:var(--radius); padding:20px; margin-bottom:18px;}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:10px; flex-wrap:wrap;}
+  .panel-head h3{margin:0; font-size:15.5px; font-weight:800;}
+  .tab-row{display:flex; gap:6px; background:rgba(255,255,255,.03); padding:4px; border-radius:11px; flex-wrap:wrap;}
+  .tab-btn{background:none; border:none; padding:7px 13px; border-radius:8px; font-size:12.5px; font-weight:700; color:var(--mute); transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .2s ease, color .2s ease;}
+  .tab-btn:active{transform:scale(0.93);}
+  .tab-btn.active{background:var(--emerald); color:#04140F;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--mute-2); font-weight:700; padding:0 12px 10px; border-bottom:1px solid var(--line);}
+  tbody td{padding:13px 12px; border-bottom:1px solid rgba(255,255,255,.045); vertical-align:middle;}
+  tbody tr:hover{background:rgba(255,255,255,.025);}
+  tbody tr:last-child td{border-bottom:none;}
+  .cell-name{font-weight:700;}
+  .cell-mute{color:var(--mute); font-size:12px;}
+  .table-wrap{overflow-x:auto;}
+  .empty-row{text-align:center; padding:40px 10px; color:var(--mute-2); font-size:13px;}
+
+  .chip{font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:99px; display:inline-block; white-space:nowrap;}
+  .chip.ok{background:var(--ok-soft); color:var(--ok);}
+  .chip.warn{background:var(--warn-soft); color:var(--warn);}
+  .chip.bad{background:var(--danger-soft); color:var(--danger);}
+  .chip.neutral{background:rgba(255,255,255,.08); color:var(--mute);}
+
+  .row-actions{display:flex; gap:6px; flex-wrap:wrap;}
+
+  /* Modal */
+  .modal-overlay{position:fixed; inset:0; background:rgba(2,6,5,.72); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; animation:fadein .18s ease;}
+  .modal-box{
+    width:100%; max-width:480px; max-height:88vh; overflow-y:auto; background:linear-gradient(165deg, var(--panel-2), var(--panel));
+    border:1px solid var(--card-brd); border-radius:22px; padding:26px; box-shadow:0 30px 70px rgba(0,0,0,.5);
+  }
+  .modal-box h3{margin:0 0 4px; font-size:18px; font-weight:800;}
+  .modal-box .desc{color:var(--mute); font-size:12.5px; margin:0 0 20px;}
+  .modal-close{position:absolute; top:16px; right:16px;}
+  .kv-line{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13px;}
+  .kv-line span{color:var(--mute);}
+  .kv-line b{font-weight:700;}
+  .section-label{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--gold); margin:20px 0 10px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  /* Toast */
+  #toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); background:#0F221C; border:1px solid var(--card-brd); color:var(--text); padding:13px 22px; border-radius:99px; font-size:13.5px; font-weight:600; box-shadow:0 12px 30px rgba(0,0,0,.4); z-index:200; opacity:0; transition:all .25s ease; pointer-events:none;}
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .spinner{width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.25); border-top-color:#04140F; animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-block{display:flex; align-items:center; justify-content:center; padding:50px 0; color:var(--mute);}
+  .loading-block .spinner{border-top-color:var(--emerald); border-color:rgba(255,255,255,.1);}
+
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:40;}
+
+  @media (max-width:980px){
+    .kpi-grid{grid-template-columns:1fr 1fr;}
+    #sidebar{transform:translateX(-100%);}
+    #sidebar.open{transform:translateX(0);}
+    #main{margin-left:0;}
+    .hamburger{display:flex;}
+    .sidebar-backdrop.show{display:block;}
+    .top-search{display:none;}
+    .grid-2{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .kpi-grid{grid-template-columns:1fr 1fr;}
+    #content{padding:18px 14px 50px;}
+    #topbar{padding:14px 16px;}
+    .panel{padding:15px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand-mark">A</div>
+    <div class="login-eyebrow"><span class="pulse-dot"></span> কন্ট্রোল সেন্টার</div>
+    <h1 class="login-title">Apexify Admin</h1>
+    <p class="login-sub">অ্যাডমিন ক্রেডেনশিয়াল দিয়ে সাইন-ইন করুন। এই প্যানেল থেকে ইউজার, ডিপোজিট, অ্যাক্টিভেশন ও সিস্টেম সেটিংস — সবকিছু নিয়ন্ত্রণ করা যাবে।</p>
+
+    <div class="field">
+      <label>অ্যাডমিন ইমেইল</label>
+      <div class="field-input">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        <input id="login-email" type="email" placeholder="admin@apexify.com" autocomplete="username">
+      </div>
+    </div>
+    <div class="field">
+      <label>পাসওয়ার্ড</label>
+      <div class="field-input">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button class="eye-toggle" onclick="toggleEye('login-pass',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="login-btn" onclick="doAdminLogin()" disabled>লোড হচ্ছে...</button>
+    <div class="err-msg" id="login-err"></div>
+    <div class="login-foot">শুধুমাত্র অনুমোদিত অ্যাডমিন ইমেইল দিয়েই প্রবেশ করা যাবে।<br>প্রজেক্ট: apexify-72bc2<br><span style="opacity:.6">Build: 2026-08-30-r2</span></div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="app-shell" class="hidden">
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+  <aside id="sidebar">
+    <div class="sb-brand">
+      <div class="mark">A</div>
+      <div class="txt"><b>Apexify</b><span>ADMIN CONSOLE</span></div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-link active" data-page="dashboard" onclick="goPage('dashboard')">${''}</button>
+    </nav>
+  </aside>
+
+  <div id="main">
+    <header id="topbar">
+      <button class="hamburger" onclick="toggleSidebar(true)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div>
+        <h2 class="page-heading" id="page-heading">ড্যাশবোর্ড</h2>
+        <div class="page-sub" id="page-sub">সিস্টেমের সার্বিক অবস্থা</div>
+      </div>
+      <div class="top-search">
+        <div class="field-input">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="global-search" placeholder="ইউজার, ফোন বা আইডি সার্চ করুন..." oninput="onGlobalSearch(this.value)">
+        </div>
+      </div>
+      <button class="icon-btn" onclick="refreshCurrentPage()" title="রিফ্রেশ"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+    </header>
+
+    <main id="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="page active" id="page-dashboard">
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="loading-block" style="grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>সাম্প্রতিক লেনদেন</h3><button class="btn btn-ghost btn-sm" onclick="goPage('transactions')">সব দেখুন</button></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ধরন</th><th>শিরোনাম</th><th>পরিমাণ</th><th>ইউজার</th><th>সময়</th></tr></thead>
+            <tbody id="dash-recent-tx"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ USERS ============ -->
+      <section class="page" id="page-users">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>সকল ইউজার</h3>
+            <div class="tab-row" id="user-status-tabs">
+              <button class="tab-btn active" data-status="all" onclick="setUserFilter('all')">সব</button>
+              <button class="tab-btn" data-status="active" onclick="setUserFilter('active')">সক্রিয়</button>
+              <button class="tab-btn" data-status="inactive" onclick="setUserFilter('inactive')">নিষ্ক্রিয়</button>
+              <button class="tab-btn" data-status="pending" onclick="setUserFilter('pending')">পেন্ডিং</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>নাম</th><th>ফোন</th><th>ইউজার আইডি</th><th>স্ট্যাটাস</th><th>মোট ব্যালেন্স</th><th>যোগদান</th><th></th></tr></thead>
+            <tbody id="users-tbody"><tr><td class="empty-row" colspan="7">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ DEPOSITS ============ -->
+      <section class="page" id="page-deposits">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>ডিপোজিট রিকোয়েস্ট</h3>
+            <div class="tab-row" id="deposit-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setDepositFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="approved" onclick="setDepositFilter('approved')">অনুমোদিত</button>
+              <button class="tab-btn" data-status="rejected" onclick="setDepositFilter('rejected')">বাতিল</button>
+              <button class="tab-btn" data-status="all" onclick="setDepositFilter('all')">সব</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>মেথড</th><th>পরিমাণ</th><th>Trx ID</th><th>প্রেরকের নম্বর</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="deposits-tbody"><tr><td class="empty-row" colspan="7">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ WITHDRAWALS ============ -->
+      <section class="page" id="page-withdrawals">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>উইথড্র রিকোয়েস্ট</h3>
+            <div class="tab-row" id="withdrawal-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setWithdrawalFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="approved" onclick="setWithdrawalFilter('approved')">সম্পন্ন</button>
+              <button class="tab-btn" data-status="rejected" onclick="setWithdrawalFilter('rejected')">বাতিল</button>
+              <button class="tab-btn" data-status="all" onclick="setWithdrawalFilter('all')">সব</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>পরিমাণ</th><th>ফি</th><th>প্রদেয়</th><th>ওয়ালেট</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="withdrawals-tbody"><tr><td class="empty-row" colspan="7">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ ACTIVATIONS ============ -->
+      <section class="page" id="page-activations">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>অ্যাক্টিভেশন রিকোয়েস্ট</h3>
+            <div class="tab-row" id="activation-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setActivationFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="approved" onclick="setActivationFilter('approved')">অনুমোদিত</button>
+              <button class="tab-btn" data-status="rejected" onclick="setActivationFilter('rejected')">বাতিল</button>
+              <button class="tab-btn" data-status="all" onclick="setActivationFilter('all')">সব</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ফি</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="activations-tbody"><tr><td class="empty-row" colspan="4">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ SALARY REQUESTS ============ -->
+      <section class="page" id="page-salaryrequests">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>স্যালারি রিকোয়েস্ট</h3>
+            <div class="tab-row" id="salary-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setSalaryFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="approved" onclick="setSalaryFilter('approved')">অনুমোদিত</button>
+              <button class="tab-btn" data-status="rejected" onclick="setSalaryFilter('rejected')">বাতিল</button>
+              <button class="tab-btn" data-status="all" onclick="setSalaryFilter('all')">সব</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>মাস</th><th>পরিমাণ</th><th>রেফারেল</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="salary-tbody"><tr><td class="empty-row" colspan="6">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ INVESTMENT PACKAGES ============ -->
+      <section class="page" id="page-packages">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>ইনভেস্টমেন্ট প্যাকেজ</h3>
+            <button class="btn btn-primary btn-sm" onclick="openCreatePackageModal()">+ নতুন প্যাকেজ</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>নাম</th><th>দাম</th><th>মেয়াদ</th><th>দৈনিক আয়</th><th>মোট রিটার্ন</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+            <tbody id="packages-tbody"><tr><td class="empty-row" colspan="7">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ SELL SERVICE CONFIG ============ -->
+      <section class="page" id="page-sellconfig">
+        <div class="panel">
+          <div class="panel-head"><h3>সেল সার্ভিস কনফিগ</h3></div>
+          <div class="tab-row" id="sellconfig-tabs" style="margin-bottom:16px">
+            <button class="tab-btn active" data-svc="gmail" onclick="setSellConfigTab('gmail')">Gmail</button>
+            <button class="tab-btn" data-svc="facebook" onclick="setSellConfigTab('facebook')">Facebook</button>
+            <button class="tab-btn" data-svc="instagram" onclick="setSellConfigTab('instagram')">Instagram</button>
+          </div>
+          <div class="field"><label>রেট (৳ প্রতি একাউন্ট)</label><div class="field-input"><input id="sc-rate" type="number" min="0"></div></div>
+          <div class="field"><label>ভিডিও লিংক (ঐচ্ছিক)</label><div class="field-input"><input id="sc-videoLink" placeholder="https://..."></div></div>
+          <div class="field"><label>ব্যবহারের পাসওয়ার্ড (ঐচ্ছিক)</label><div class="field-input"><input id="sc-requiredPassword" placeholder="যেমন: @jony@#&"></div></div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 10px;">ইউজারকে বলা হবে তার একাউন্টের পাসওয়ার্ড জমা দেওয়ার আগে এই পাসওয়ার্ডে বদলে নিতে।</p>
+          <button class="btn btn-primary btn-block" onclick="saveSellConfig(this)">সংরক্ষণ করুন</button>
+          <div class="err-msg" id="sc-err"></div>
+        </div>
+      </section>
+
+      <!-- ============ SELL SUBMISSIONS ============ -->
+      <section class="page" id="page-sellsubmissions">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>সেল সাবমিশন</h3>
+            <div class="row-actions">
+              <button class="btn btn-ghost btn-sm" onclick="downloadSellSubmissionsCSV()">CSV ডাউনলোড</button>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer; margin:0;">CSV আপলোড
+                <input type="file" accept=".csv" onchange="uploadSellSubmissionsCSV(this)" style="display:none">
+              </label>
+            </div>
+          </div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 12px;">
+            CSV ডাউনলোড করে ম্যানুয়াল চেক করো, <span class="mono">status</span> কলামে <span class="mono">approved</span> বা <span class="mono">rejected</span> লিখে সেভ করো,
+            তারপর সেই ফাইলটাই আপলোড করো — সবার ইতিহাসে সাথে সাথে আপডেট হয়ে যাবে এবং অনুমোদিতদের টাকা যোগ হয়ে যাবে।
+          </p>
+          <div class="tab-row" id="sellsub-service-tabs" style="margin-bottom:10px">
+            <button class="tab-btn active" data-svc="gmail" onclick="setSellSubService('gmail')">Gmail</button>
+            <button class="tab-btn" data-svc="facebook" onclick="setSellSubService('facebook')">Facebook</button>
+            <button class="tab-btn" data-svc="instagram" onclick="setSellSubService('instagram')">Instagram</button>
+          </div>
+          <div class="tab-row" id="sellsub-status-tabs" style="margin-bottom:12px">
+            <button class="tab-btn active" data-status="pending" onclick="setSellSubFilter('pending')">পেন্ডিং</button>
+            <button class="tab-btn" data-status="approved" onclick="setSellSubFilter('approved')">অনুমোদিত</button>
+            <button class="tab-btn" data-status="rejected" onclick="setSellSubFilter('rejected')">বাতিল</button>
+            <button class="tab-btn" data-status="all" onclick="setSellSubFilter('all')">সব</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>তথ্য</th><th>রেট</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="sellsub-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+
+
+      <section class="page" id="page-wallets">
+        <div class="panel">
+          <div class="panel-head"><h3>ওয়ালেট ভেরিফিকেশন (অ-যাচাইকৃত)</h3></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ইউজার</th><th>টাইপ</th><th>নম্বর</th><th>যোগ হয়েছে</th><th></th></tr></thead>
+            <tbody id="wallets-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ TRANSACTIONS ============ -->
+      <section class="page" id="page-transactions">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>সকল লেনদেন</h3>
+            <div class="tab-row" id="tx-type-tabs">
+              <button class="tab-btn active" data-type="all" onclick="setTxFilter('all')">সব</button>
+              <button class="tab-btn" data-type="daily" onclick="setTxFilter('daily')">দৈনিক আয়</button>
+              <button class="tab-btn" data-type="referral" onclick="setTxFilter('referral')">রেফারেল</button>
+              <button class="tab-btn" data-type="deposit" onclick="setTxFilter('deposit')">ডিপোজিট</button>
+              <button class="tab-btn" data-type="activation" onclick="setTxFilter('activation')">অ্যাক্টিভেশন</button>
+              <button class="tab-btn" data-type="investment" onclick="setTxFilter('investment')">প্যাকেজ ক্রয়</button>
+              <button class="tab-btn" data-type="investment_income" onclick="setTxFilter('investment_income')">প্যাকেজ আয়</button>
+              <button class="tab-btn" data-type="withdraw" onclick="setTxFilter('withdraw')">উইথড্র</button>
+              <button class="tab-btn" data-type="admin_adjust" onclick="setTxFilter('admin_adjust')">এডমিন সমন্বয়</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ধরন</th><th>শিরোনাম</th><th>পরিমাণ</th><th>UID</th><th>সময়</th></tr></thead>
+            <tbody id="tx-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ REDEEM CODES ============ -->
+      <section class="page" id="page-redeemcodes">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>রিডিম কোড</h3>
+            <button class="btn btn-primary btn-sm" onclick="openCreateCodeModal()">+ নতুন কোড</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>কোড</th><th>পরিমাণ</th><th>ব্যবহার</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+            <tbody id="codes-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ TASK MANAGEMENT ============ -->
+      <section class="page" id="page-tasks">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>টাস্ক ম্যানেজমেন্ট</h3>
+            <button class="btn btn-primary btn-sm" onclick="openCreateTaskModal()">+ নতুন টাস্ক</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>শিরোনাম</th><th>রিওয়ার্ড</th><th>স্লট</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+            <tbody id="tasks-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ TASK SUBMISSIONS ============ -->
+      <section class="page" id="page-tasksubmissions">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>টাস্ক সাবমিশন</h3>
+            <div class="tab-row" id="tasksub-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setTaskSubFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="approved" onclick="setTaskSubFilter('approved')">অনুমোদিত</button>
+              <button class="tab-btn" data-status="rejected" onclick="setTaskSubFilter('rejected')">বাতিল</button>
+              <button class="tab-btn" data-status="all" onclick="setTaskSubFilter('all')">সব</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>টাস্ক</th><th>রিওয়ার্ড</th><th>প্রমাণ</th><th>স্ট্যাটাস</th><th>সময়</th><th></th></tr></thead>
+            <tbody id="tasksub-tbody"><tr><td class="empty-row" colspan="6">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ PASSWORD RESET REQUESTS ============ -->
+      <section class="page" id="page-passwordresets">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>পাসওয়ার্ড রিসেট রিকোয়েস্ট</h3>
+            <div class="tab-row" id="pwreset-status-tabs">
+              <button class="tab-btn active" data-status="pending" onclick="setPwResetFilter('pending')">পেন্ডিং</button>
+              <button class="tab-btn" data-status="resolved" onclick="setPwResetFilter('resolved')">সমাধান হয়েছে</button>
+              <button class="tab-btn" data-status="all" onclick="setPwResetFilter('all')">সব</button>
+            </div>
+          </div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 12px;">
+            পাসওয়ার্ড কখনো প্লেইন-টেক্সটে দেখা সম্ভব না। সমাধান করতে: Firebase Console → Authentication-এ গিয়ে এই ফোন নম্বরের ইমেইল
+            (<span class="mono">০১XXXXXXXXX@login.apexify.local</span> ফরম্যাটে) খুঁজে বের করো, "..." মেনু থেকে <b>Reset password</b> করে নতুন পাসওয়ার্ড দাও,
+            তারপর ইউজারকে ফোনে/হোয়াটসঅ্যাপে নতুন পাসওয়ার্ডটা জানিয়ে দাও।
+          </p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ফোন নম্বর</th><th>নোট</th><th>সময়</th><th>স্ট্যাটাস</th><th></th></tr></thead>
+            <tbody id="pwreset-tbody"><tr><td class="empty-row" colspan="5">লোড হচ্ছে...</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="page" id="page-settings">
+        <div class="panel" style="max-width:620px">
+          <div class="panel-head"><h3>সিস্টেম সেটিংস</h3></div>
+          <p class="desc" style="color:var(--mute); font-size:12.5px; margin-top:-8px;">এই মানগুলো ইউজার অ্যাপে সরাসরি প্রতিফলিত হবে (Firestore: settings/config)।</p>
+          <div class="field">
+            <label>অ্যাক্টিভেশন ফি (৳)</label>
+            <div class="field-input"><input id="set-activationFee" type="number" min="0"></div>
+          </div>
+          <div class="field">
+            <label>রেফারেল কমিশন (৳)</label>
+            <div class="field-input"><input id="set-referralCommission" type="number" min="0"></div>
+          </div>
+          <div class="field">
+            <label>দৈনিক ফ্রি ইনকাম (৳)</label>
+            <div class="field-input"><input id="set-dailyFreeIncome" type="number" min="0"></div>
+          </div>
+          <div class="section-label">ডিপোজিট সীমা</div>
+          <div class="grid-2">
+            <div class="field"><label>সর্বনিম্ন ডিপোজিট (৳)</label><div class="field-input"><input id="set-minDeposit" type="number" min="0"></div></div>
+            <div class="field"><label>সর্বোচ্চ ডিপোজিট (৳)</label><div class="field-input"><input id="set-maxDeposit" type="number" min="0"></div></div>
+          </div>
+          <div class="section-label">উইথড্র সীমা</div>
+          <div class="grid-2">
+            <div class="field"><label>সর্বনিম্ন উইথড্র (৳)</label><div class="field-input"><input id="set-minWithdraw" type="number" min="0"></div></div>
+            <div class="field"><label>সর্বোচ্চ উইথড্র (৳)</label><div class="field-input"><input id="set-maxWithdraw" type="number" min="0"></div></div>
+          </div>
+          <div class="section-label">ফিক্সড স্যালারি</div>
+          <div class="grid-2">
+            <div class="field"><label>টার্গেট (সক্রিয় রেফারেল)</label><div class="field-input"><input id="set-salaryTarget" type="number" min="1"></div></div>
+            <div class="field"><label>মাসিক স্যালারি (৳)</label><div class="field-input"><input id="set-salaryMonthly" type="number" min="0"></div></div>
+          </div>
+          <div class="section-label">উইথড্র নীতি</div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 10px;">নিয়ন্ত্রণ করো কারা উইথড্র রিকোয়েস্ট পাঠাতে পারবে।</p>
+          <div class="field-input" style="margin-bottom:14px">
+            <select id="set-withdrawPolicy" style="border:none; outline:none; flex:1; background:transparent; color:var(--text); font-size:14px;">
+              <option value="all">সবাই পারবে</option>
+              <option value="subscribers_only">শুধু সাবস্ক্রিপশন মেম্বার (যেকোনো একটি প্যাকেজ কিনেছে এমন)</option>
+            </select>
+          </div>
+          <div class="section-label">সাপোর্ট</div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 10px;">ইউজার অ্যাপের সব "সাপোর্ট" বাটনে এই লিংকটাই খুলবে (যেমন WhatsApp, Messenger, বা Telegram লিংক)।</p>
+          <div class="field"><label>সাপোর্ট লিংক</label><div class="field-input"><input id="set-supportLink" placeholder="https://wa.me/8801XXXXXXXXX"></div></div>
+          <div class="section-label">অ্যাপ ডাউনলোড</div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 10px;">ইউজার ড্যাশবোর্ডে "অ্যাপ ডাউনলোড করুন" বাটন দেখাবে (লিংক খালি রাখলে বাটনটাই দেখাবে না)।</p>
+          <div class="field"><label>APK ফাইলের লিংক</label><div class="field-input"><input id="set-apkLink" placeholder="https://apexify-com.vercel.app/apexify.apk"></div></div>
+          <button class="btn btn-primary btn-block" style="margin-top:6px" onclick="saveSettings(this)">সংরক্ষণ করুন</button>
+          <div class="err-msg" id="settings-err"></div>
+
+          <div class="section-label">মেইনটেন্যান্স</div>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:-4px 0 10px;">যেসব ইউজার নতুন আপডেটের আগে রেজিস্টার করেছে, তাদের পাবলিক প্রোফাইল (রেফারেল লুকআপ ও লিডারবোর্ডের জন্য) তৈরি করে দেয়। একাধিকবার চাপলেও সমস্যা নেই।</p>
+          <button class="btn btn-ghost btn-block btn-sm" onclick="backfillPublicProfiles()" id="backfill-btn">পুরনো ইউজারদের পাবলিক প্রোফাইল তৈরি করুন</button>
+          <p class="desc" style="color:var(--mute); font-size:12px; margin:14px 0 10px;">যারা "শুধু সাবস্ক্রিপশন মেম্বার" চালু করার আগেই প্যাকেজ কিনেছিল, তাদের সঠিকভাবে চিহ্নিত করে দেয় — যাতে তাদের ভুলবশত আবার প্যাকেজ কিনতে না বলে।</p>
+          <button class="btn btn-ghost btn-block btn-sm" onclick="backfillPurchasedFlag()" id="backfill-purchase-btn">যারা প্যাকেজ কিনেছে তাদের ফ্ল্যাগ ঠিক করুন</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast"></div>
+
+<script type="module">
+  try{
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js");
+    const {
+      getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+    } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js");
+    const {
+      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, collectionGroup,
+      serverTimestamp, query, where, orderBy, limit, getDocs, runTransaction, increment
+    } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsgQJgZ64-ARLqKa3vcdQpu_xVupD90W4",
+      authDomain: "apexify-72bc2.firebaseapp.com",
+      projectId: "apexify-72bc2",
+      storageBucket: "apexify-72bc2.firebasestorage.app",
+      messagingSenderId: "114061131405",
+      appId: "1:114061131405:web:2e82e5dbdbf23ea4976cc4",
+      measurementId: "G-C1JL98P681"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.apexifyAdminFB = {
+      auth, db, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+      doc, getDoc, setDoc, updateDoc, addDoc, collection, collectionGroup,
+      serverTimestamp, query, where, orderBy, limit, getDocs, runTransaction, increment
+    };
+    window.dispatchEvent(new Event('apexify-admin-fb-ready'));
+  }catch(e){
+    console.error('Firebase module init failed:', e);
+    window.apexifyAdminFBError = e;
+    window.dispatchEvent(new Event('apexify-admin-fb-error'));
+  }
+</script>
+
+<script>
+/* =====================================================================
+   ADMIN ALLOWLIST — add every admin's login email here.
+   Create these accounts in: Firebase Console → Authentication → Users → Add user.
+   Only emails listed here will be allowed into this panel.
+   ===================================================================== */
+const ADMIN_EMAILS = [
+  "hemelbala84@gmail.com"
+];
+
+/* ---------------- helpers ---------------- */
+function fmt(n){ return '৳' + Number(n||0).toLocaleString('en-US'); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(ts){
+  try{
+    if(!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('bn-BD',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return '—'; }
+}
+// Wraps a button click: disables it, shows a spinner in place of its label,
+// runs the async action, then restores the button — prevents double-submits.
+async function withBtnLoading(btn, fn){
+  if(!btn){ await fn(); return; }
+  if(btn.dataset.busy === '1') return;
+  btn.dataset.busy = '1';
+  const original = btn.innerHTML;
+  const origWidth = btn.offsetWidth;
+  btn.style.minWidth = origWidth + 'px';
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+  try{
+    await fn();
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+    btn.style.minWidth = '';
+    btn.dataset.busy = '0';
+  }
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(window.__toastT);
+  window.__toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+function toggleEye(id,btn){
+  const inp=document.getElementById(id);
+  inp.type = inp.type==='password' ? 'text' : 'password';
+}
+function openModal(html){
+  document.getElementById('modal-root').innerHTML = html;
+}
+function closeModal(){
+  document.getElementById('modal-root').innerHTML = '';
+}
+function confirmAction(title, desc, onYes, yesLabel, danger){
+  openModal(`
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box" style="max-width:380px">
+      <h3>${esc(title)}</h3>
+      <p class="desc">${esc(desc)}</p>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">বাতিল</button>
+        <button class="btn ${danger?'btn-danger':'btn-primary'}" style="flex:1" id="confirm-yes-btn">${esc(yesLabel||'নিশ্চিত করুন')}</button>
+      </div>
+    </div>
+  </div>`);
+  document.getElementById('confirm-yes-btn').onclick = async ()=>{
+    const btn=document.getElementById('confirm-yes-btn');
+    btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+    try{ await onYes(); closeModal(); }
+    catch(e){ console.error(e); toast('একটি সমস্যা হয়েছে, আবার চেষ্টা করুন'); btn.disabled=false; btn.textContent=yesLabel||'নিশ্চিত করুন'; }
+  };
+}
+
+/* ---------------- nav / routing ---------------- */
+const PAGES = [
+  {id:'dashboard', label:'ড্যাশবোর্ড', sub:'সিস্টেমের সার্বিক অবস্থা', icon:'<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>'},
+  {id:'users', label:'ইউজার ম্যানেজমেন্ট', sub:'সকল একাউন্ট নিয়ন্ত্রণ করুন', icon:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'},
+  {id:'deposits', label:'ডিপোজিট রিকোয়েস্ট', sub:'ব্যালেন্স রিচার্জ অনুমোদন করুন', icon:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', countKey:'pendingDeposits'},
+  {id:'withdrawals', label:'উইথড্র রিকোয়েস্ট', sub:'ইউজারের টাকা তোলার অনুরোধ', icon:'<path d="M12 1v22M9 5h6.5a3.5 3.5 0 0 1 0 7H8a3.5 3.5 0 0 0 0 7H15"/>', countKey:'pendingWithdrawals'},
+  {id:'activations', label:'অ্যাক্টিভেশন রিকোয়েস্ট', sub:'একাউন্ট চালু করার অনুরোধ', icon:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/>', countKey:'pendingActivations'},
+  {id:'salaryrequests', label:'স্যালারি রিকোয়েস্ট', sub:'ফিক্সড স্যালারি দাবি', icon:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>', countKey:'pendingSalary'},
+  {id:'packages', label:'ইনভেস্টমেন্ট প্যাকেজ', sub:'সাবস্ক্রিপশন প্ল্যান তৈরি ও নিয়ন্ত্রণ', icon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/>'},
+  {id:'sellconfig', label:'সেল সার্ভিস কনফিগ', sub:'Gmail/Facebook/Instagram রেট, ভিডিও, পাসওয়ার্ড', icon:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/>'},
+  {id:'sellsubmissions', label:'সেল সাবমিশন', sub:'জমা দেওয়া একাউন্ট রিভিউ ও বাল্ক প্রসেস', icon:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/>', countKey:'pendingSellSubmissions'},
+  {id:'wallets', label:'ওয়ালেট ভেরিফিকেশন', sub:'bKash/Nagad নম্বর যাচাই', icon:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>', countKey:'unverifiedWallets'},
+  {id:'transactions', label:'লেনদেনের ইতিহাস', sub:'সকল ট্রানজেকশন লগ', icon:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>'},
+  {id:'redeemcodes', label:'রিডিম কোড', sub:'প্রোমো কোড তৈরি ও নিয়ন্ত্রণ', icon:'<path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/>'},
+  {id:'tasks', label:'টাস্ক ম্যানেজমেন্ট', sub:'টাস্ক তৈরি, লিংক ও স্লট সেট করুন', icon:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'},
+  {id:'tasksubmissions', label:'টাস্ক সাবমিশন', sub:'ইউজারের জমা দেওয়া কাজ যাচাই', icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/>', countKey:'pendingTaskSubmissions'},
+  {id:'passwordresets', label:'পাসওয়ার্ড রিসেট রিকোয়েস্ট', sub:'যারা লগইন করতে পারছে না', icon:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', countKey:'pendingPasswordResets'},
+  {id:'settings', label:'সিস্টেম সেটিংস', sub:'ফি ও কমিশন কনফিগার করুন', icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'}
+];
+const badgeCounts = {pendingDeposits:0, pendingActivations:0, unverifiedWallets:0, pendingWithdrawals:0, pendingSalary:0, pendingTaskSubmissions:0, pendingPasswordResets:0, pendingSellSubmissions:0};
+
+function buildSidebarNav(){
+  const nav = document.querySelector('.sb-nav');
+  nav.innerHTML = PAGES.map(p=>`
+    <button class="sb-link${p.id==='dashboard'?' active':''}" data-page="${p.id}" onclick="goPage('${p.id}')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p.icon}</svg>
+      <span>${p.label}</span>
+      ${p.countKey ? `<span class="cnt hidden" id="badge-${p.countKey}">0</span>` : ''}
+    </button>
+  `).join('');
+}
+
+let currentPage = 'dashboard';
+function goPage(id){
+  currentPage = id;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.sb-link').forEach(el=>el.classList.toggle('active', el.dataset.page===id));
+  const meta = PAGES.find(p=>p.id===id);
+  document.getElementById('page-heading').textContent = meta.label;
+  document.getElementById('page-sub').textContent = meta.sub;
+  toggleSidebar(false);
+  loadPageData(id);
+}
+function toggleSidebar(open){
+  document.getElementById('sidebar').classList.toggle('open', open);
+  document.getElementById('sidebar-backdrop').classList.toggle('show', open);
+}
+function refreshCurrentPage(){ loadPageData(currentPage, true); }
+function onGlobalSearch(val){
+  if(currentPage!=='users') goPage('users');
+  usersSearchTerm = val.trim().toLowerCase();
+  renderUsersTable();
+}
+
+/* ---------------- data caches ---------------- */
+let allUsersCache = [];
+let usersFilter = 'all';
+let usersSearchTerm = '';
+let depositsCache = [];
+let depositsFilter = 'pending';
+let activationsCache = [];
+let activationsFilter = 'pending';
+let txCache = [];
+let txFilter = 'all';
+let withdrawalsCache = [];
+let withdrawalsFilter = 'pending';
+let codesCache = [];
+let tasksAdminCache = [];
+let taskSubCache = [];
+let taskSubFilter = 'pending';
+let pwResetCache = [];
+let pwResetFilter = 'pending';
+let sellConfigCache = {};
+let sellConfigTab = 'gmail';
+let sellSubCache = [];
+let sellSubFilter = 'pending';
+let sellSubServiceFilter = 'gmail';
+let salaryCache = [];
+let salaryFilter = 'pending';
+let packagesCache = [];
+
+function loadPageData(id, force){
+  if(id==='dashboard') loadDashboard();
+  else if(id==='users') loadUsers(force);
+  else if(id==='deposits') loadDeposits(force);
+  else if(id==='withdrawals') loadWithdrawals(force);
+  else if(id==='activations') loadActivations(force);
+  else if(id==='salaryrequests') loadSalaryRequests(force);
+  else if(id==='wallets') loadWallets(force);
+  else if(id==='transactions') loadTransactions(force);
+  else if(id==='redeemcodes') loadRedeemCodes(force);
+  else if(id==='tasks') loadTasksAdmin(force);
+  else if(id==='tasksubmissions') loadTaskSubmissions(force);
+  else if(id==='passwordresets') loadPasswordResets(force);
+  else if(id==='packages') loadPackages(force);
+  else if(id==='sellconfig') loadSellConfig(force);
+  else if(id==='sellsubmissions') loadSellSubmissions(force);
+  else if(id==='settings') loadSettings();
+}
+
+/* ---------------- DASHBOARD ---------------- */
+async function loadDashboard(){
+  const fb = window.apexifyAdminFB;
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = `<div class="loading-block" style="grid-column:1/-1"><div class="spinner"></div></div>`;
+  try{
+    const usersSnap = await fb.getDocs(fb.collection(fb.db,'users'));
+    let total=0, active=0, inactive=0, pending=0, totalBalance=0, todaySignups=0;
+    const todayStr = new Date().toISOString().slice(0,10);
+    usersSnap.forEach(s=>{
+      const d=s.data(); total++;
+      if(d.status==='active') active++; else if(d.status==='pending') pending++; else inactive++;
+      totalBalance += Number(d.mainBalance||0)+Number(d.salaryBalance||0)+Number(d.referralBalance||0)+Number(d.depositBalance||0);
+      const created = d.createdAt?.toDate ? d.createdAt.toDate().toISOString().slice(0,10) : null;
+      if(created===todayStr) todaySignups++;
+    });
+    allUsersCache = usersSnap.docs.map(s=>({id:s.id, ...s.data()}));
+
+    const depSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'depositRequests'), fb.where('status','==','pending')));
+    const actSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'subscriptionRequests'), fb.where('status','==','pending')));
+    const wdSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'withdrawalRequests'), fb.where('status','==','pending')));
+    const salSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'salaryRequests'), fb.where('status','==','pending')));
+    const tskSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'taskSubmissions'), fb.where('status','==','pending')));
+    const pwSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'passwordResetRequests'), fb.where('status','==','pending')));
+    const sellSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'accountSubmissions'), fb.where('status','==','pending')));
+    badgeCounts.pendingDeposits = depSnap.size;
+    badgeCounts.pendingActivations = actSnap.size;
+    badgeCounts.pendingWithdrawals = wdSnap.size;
+    badgeCounts.pendingSalary = salSnap.size;
+    badgeCounts.pendingTaskSubmissions = tskSnap.size;
+    badgeCounts.pendingPasswordResets = pwSnap.size;
+    badgeCounts.pendingSellSubmissions = sellSnap.size;
+    updateBadges();
+
+    grid.innerHTML = `
+      <div class="kpi-card" style="--accent-line:var(--emerald)">
+        <div class="lbl">মোট ইউজার <div class="kpi-ic">${svgUsers()}</div></div>
+        <div class="val">${total.toLocaleString('en-US')}</div>
+        <div class="sub">আজ যোগ দিয়েছে ${todaySignups} জন</div>
+      </div>
+      <div class="kpi-card" style="--accent-line:var(--ok)">
+        <div class="lbl">সক্রিয় একাউন্ট <div class="kpi-ic">${svgCheck()}</div></div>
+        <div class="val">${active.toLocaleString('en-US')}</div>
+        <div class="sub">নিষ্ক্রিয় ${inactive} · পেন্ডিং ${pending}</div>
+      </div>
+      <div class="kpi-card" style="--accent-line:var(--gold)">
+        <div class="lbl">মোট ব্যালেন্স (সকল ইউজার) <div class="kpi-ic">${svgWallet()}</div></div>
+        <div class="val">${fmt(totalBalance)}</div>
+        <div class="sub">সকল ব্যালেন্স ফিল্ডের যোগফল</div>
+      </div>
+      <div class="kpi-card" style="--accent-line:var(--warn)">
+        <div class="lbl">অপেক্ষমান রিকোয়েস্ট <div class="kpi-ic">${svgClock()}</div></div>
+        <div class="val">${badgeCounts.pendingDeposits + badgeCounts.pendingActivations + badgeCounts.pendingWithdrawals}</div>
+        <div class="sub">ডিপোজিট ${badgeCounts.pendingDeposits} · উইথড্র ${badgeCounts.pendingWithdrawals} · অ্যাক্টিভেশন ${badgeCounts.pendingActivations}</div>
+      </div>`;
+
+    const txSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'transactions'), fb.orderBy('createdAt','desc'), fb.limit(8)));
+    const tbody = document.getElementById('dash-recent-tx');
+    if(txSnap.empty){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো লেনদেন নেই</td></tr>`; }
+    else{
+      tbody.innerHTML = txSnap.docs.map(s=>{
+        const d=s.data();
+        return `<tr>
+          <td>${txTypeChip(d.type)}</td>
+          <td>${esc(d.title||'—')}</td>
+          <td class="${d.amount<0?'':''}" style="color:${d.amount<0?'var(--danger)':'var(--ok)'}; font-weight:700;">${d.amount<0?'-':'+'}${fmt(Math.abs(d.amount||0))}</td>
+          <td class="cell-mute mono">${esc((d.uid||'').slice(0,8))}</td>
+          <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+        </tr>`;
+      }).join('');
+    }
+  }catch(e){
+    console.error(e);
+    grid.innerHTML = `<div class="panel" style="grid-column:1/-1; text-align:center; color:var(--danger)">ডেটা লোড করা যায়নি। Firestore নিরাপত্তা নিয়ম (rules) পরীক্ষা করুন — অ্যাডমিনকে read/write অনুমতি দিতে হবে।</div>`;
+  }
+}
+function updateBadges(){
+  Object.keys(badgeCounts).forEach(k=>{
+    const el = document.getElementById('badge-'+k);
+    if(!el) return;
+    if(badgeCounts[k]>0){ el.textContent=badgeCounts[k]; el.classList.remove('hidden'); }
+    else el.classList.add('hidden');
+  });
+}
+function svgUsers(){return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`;}
+function svgCheck(){return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>`;}
+function svgWallet(){return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/></svg>`;}
+function svgClock(){return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;}
+function txTypeChip(type){
+  const map = {daily:['ok','দৈনিক'], referral:['ok','রেফারেল'], deposit:['warn','ডিপোজিট'], activation:['bad','অ্যাক্টিভেশন'], admin_adjust:['neutral','এডমিন'], withdraw:['bad','উইথড্র'], investment:['bad','প্যাকেজ ক্রয়'], investment_income:['ok','প্যাকেজ আয়'], task:['ok','টাস্ক'], redeem:['ok','রিডিম'], salary:['ok','স্যালারি']};
+  const m = map[type] || ['neutral', type||'—'];
+  return `<span class="chip ${m[0]}">${m[1]}</span>`;
+}
+
+/* ---------------- USERS ---------------- */
+async function loadUsers(force){
+  const fb = window.apexifyAdminFB;
+  if(force || allUsersCache.length===0){
+    document.getElementById('users-tbody').innerHTML = `<tr><td class="empty-row" colspan="7"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      const snap = await fb.getDocs(fb.query(fb.collection(fb.db,'users'), fb.orderBy('createdAt','desc')));
+      allUsersCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+    }catch(e){ console.error(e); toast('ইউজার লোড করা যায়নি'); }
+  }
+  renderUsersTable();
+}
+function setUserFilter(f){
+  usersFilter=f;
+  document.querySelectorAll('#user-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  renderUsersTable();
+}
+function renderUsersTable(){
+  let rows = allUsersCache;
+  if(usersFilter!=='all') rows = rows.filter(u=>(u.status||'inactive')===usersFilter);
+  if(usersSearchTerm){
+    rows = rows.filter(u=>
+      (u.name||'').toLowerCase().includes(usersSearchTerm) ||
+      (u.phone||'').toLowerCase().includes(usersSearchTerm) ||
+      (u.userId||'').toLowerCase().includes(usersSearchTerm) ||
+      (u.referralId||'').toLowerCase().includes(usersSearchTerm)
+    );
+  }
+  const tbody = document.getElementById('users-tbody');
+  if(rows.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="7">কোনো ইউজার পাওয়া যায়নি</td></tr>`; return; }
+  tbody.innerHTML = rows.map(u=>{
+    const totalBal = Number(u.mainBalance||0)+Number(u.salaryBalance||0)+Number(u.referralBalance||0)+Number(u.depositBalance||0);
+    return `<tr>
+      <td class="cell-name">${esc(u.name||'—')}</td>
+      <td class="mono">${esc(u.phone||'—')}</td>
+      <td class="mono cell-mute">${esc(u.userId||u.id)}</td>
+      <td>${statusChip(u.status)}</td>
+      <td style="font-weight:700">${fmt(totalBal)}</td>
+      <td class="cell-mute">${fmtDate(u.createdAt)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openUserDetail('${u.id}')">বিস্তারিত</button></td>
+    </tr>`;
+  }).join('');
+}
+function statusChip(status){
+  if(status==='active') return `<span class="chip ok">সক্রিয়</span>`;
+  if(status==='pending') return `<span class="chip warn">পেন্ডিং</span>`;
+  return `<span class="chip bad">নিষ্ক্রিয়</span>`;
+}
+
+function openUserDetail(uid){
+  const u = allUsersCache.find(x=>x.id===uid);
+  if(!u) return;
+  openModal(`
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box">
+      <h3>${esc(u.name||'ইউজার')}</h3>
+      <p class="desc mono">${esc(u.phone||'')} · ${esc(u.userId||u.id)}</p>
+
+      <div class="kv-line"><span>রেফারেল আইডি</span><b class="mono">${esc(u.referralId||'—')}</b></div>
+      <div class="kv-line"><span>রেফারারের UID</span><b class="mono" style="font-size:11px">${esc(u.referrerUid||'—')}</b></div>
+      <div class="kv-line"><span>মোট সক্রিয় রেফারেল</span><b>${Number(u.referralCount||0)}</b></div>
+      <div class="kv-line"><span>যোগদান</span><b>${fmtDate(u.createdAt)}</b></div>
+      <div class="kv-line"><span>শেষ দৈনিক বোনাস</span><b>${esc(u.lastDailyCredit||'—')}</b></div>
+
+      <div class="section-label">স্ট্যাটাস</div>
+      <div class="field-input" style="margin-bottom:10px">
+        <select id="ud-status" style="border:none; outline:none; flex:1; background:transparent; color:var(--text); font-size:14px;">
+          <option value="active"${u.status==='active'?' selected':''}>সক্রিয়</option>
+          <option value="inactive"${u.status==='inactive'||!u.status?' selected':''}>নিষ্ক্রিয়</option>
+          <option value="pending"${u.status==='pending'?' selected':''}>পেন্ডিং</option>
+        </select>
+      </div>
+      <button class="btn btn-outline btn-ghost btn-block btn-sm" onclick="saveUserStatus('${uid}',this)">স্ট্যাটাস সংরক্ষণ করুন</button>
+
+      <div class="section-label">ব্যালেন্স সম্পাদনা</div>
+      <div class="grid-2">
+        <div class="field"><label>মেইন ব্যালেন্স</label><div class="field-input"><input id="ud-mainBalance" type="number" value="${Number(u.mainBalance||0)}"></div></div>
+        <div class="field"><label>স্যালারি ব্যালেন্স</label><div class="field-input"><input id="ud-salaryBalance" type="number" value="${Number(u.salaryBalance||0)}"></div></div>
+        <div class="field"><label>রেফারেল ব্যালেন্স</label><div class="field-input"><input id="ud-referralBalance" type="number" value="${Number(u.referralBalance||0)}"></div></div>
+        <div class="field"><label>ডিপোজিট ব্যালেন্স</label><div class="field-input"><input id="ud-depositBalance" type="number" value="${Number(u.depositBalance||0)}"></div></div>
+      </div>
+      <div class="field"><label>মোট রেভিনিউ</label><div class="field-input"><input id="ud-totalRevenue" type="number" value="${Number(u.totalRevenue||0)}"></div></div>
+      <button class="btn btn-primary btn-block" onclick="saveUserBalances('${uid}',this)">ব্যালেন্স সংরক্ষণ করুন</button>
+      <div class="err-msg" id="ud-err"></div>
+
+      <div class="section-label">ওয়ালেট সমূহ</div>
+      <div id="ud-wallets">লোড হচ্ছে...</div>
+
+      <div class="section-label">রেফারকৃত ইউজার</div>
+      <div id="ud-referrals">লোড হচ্ছে...</div>
+
+      <div class="section-label">কাস্টম নোটিফিকেশন পাঠান</div>
+      <div class="field"><div class="field-input"><input id="ud-notif-title" placeholder="শিরোনাম, যেমন: বিশেষ অফার"></div></div>
+      <div class="field"><div class="field-input"><input id="ud-notif-body" placeholder="বার্তা লিখুন"></div></div>
+      <button class="btn btn-ghost btn-block btn-sm" onclick="sendUserNotification('${uid}',this)">পাঠান</button>
+
+      <button class="btn btn-ghost btn-block" style="margin-top:18px" onclick="closeModal()">বন্ধ করুন</button>
+    </div>
+  </div>`);
+  loadUserWallets(uid);
+  loadUserReferrals(uid);
+}
+
+async function loadUserReferrals(uid){
+  const fb = window.apexifyAdminFB;
+  const box = document.getElementById('ud-referrals');
+  try{
+    const snap = await fb.getDocs(fb.query(fb.collection(fb.db,'users'), fb.where('referrerUid','==',uid)));
+    if(snap.empty){ box.innerHTML = `<p class="desc" style="margin:0">কেউ এখনো রেফার হয়নি</p>`; return; }
+    box.innerHTML = snap.docs.map(s=>{
+      const r=s.data();
+      return `<div class="kv-line"><span>${esc(r.name||'—')} · <span class="mono">${esc(r.phone||'')}</span></span>${statusChip(r.status)}</div>`;
+    }).join('');
+  }catch(e){ console.error(e); box.innerHTML = `<p class="desc" style="margin:0; color:var(--danger)">লোড ব্যর্থ</p>`; }
+}
+
+async function sendUserNotification(uid, btn){
+  const title = document.getElementById('ud-notif-title').value.trim();
+  const body = document.getElementById('ud-notif-body').value.trim();
+  if(!title || !body){ toast('শিরোনাম ও বার্তা লিখুন'); return; }
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',uid,'notifications'), {title, body, type:'admin', read:false, createdAt: fb.serverTimestamp()});
+      document.getElementById('ud-notif-title').value='';
+      document.getElementById('ud-notif-body').value='';
+      toast('নোটিফিকেশন পাঠানো হয়েছে');
+    }catch(e){ console.error(e); toast('পাঠানো যায়নি'); }
+  });
+}
+
+function loadUserWallets(uid){
+  const box = document.getElementById('ud-wallets');
+  if(!box) return;
+  const u = allUsersCache.find(x=>x.id===uid);
+  if(!u){ box.innerHTML = `<p class="desc" style="margin:0; color:var(--danger)">লোড ব্যর্থ</p>`; return; }
+
+  const rows = [];
+  if(u.bkashNumber){
+    rows.push(`<div class="kv-line">
+      <span>bKash · <span class="mono">${esc(u.bkashNumber)}</span></span>
+      <span class="row-actions">
+        ${u.bkashVerified ? `<span class="chip ok">যাচাইকৃত</span>` : `<button class="btn btn-primary btn-sm" onclick="verifyWallet('${uid}','bkash',this)">যাচাই করুন</button>`}
+        <button class="btn btn-ghost btn-sm" onclick="resetWallet('${uid}','bkash')">রিসেট</button>
+      </span>
+    </div>`);
+  }
+  if(u.nagadNumber){
+    rows.push(`<div class="kv-line">
+      <span>Nagad · <span class="mono">${esc(u.nagadNumber)}</span></span>
+      <span class="row-actions">
+        ${u.nagadVerified ? `<span class="chip ok">যাচাইকৃত</span>` : `<button class="btn btn-primary btn-sm" onclick="verifyWallet('${uid}','nagad',this)">যাচাই করুন</button>`}
+        <button class="btn btn-ghost btn-sm" onclick="resetWallet('${uid}','nagad')">রিসেট</button>
+      </span>
+    </div>`);
+  }
+  box.innerHTML = rows.length ? rows.join('') : `<p class="desc" style="margin:0">কোনো ওয়ালেট যুক্ত নেই</p>`;
+}
+async function verifyWallet(uid, field, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'users',uid), {[field+'Verified']: true});
+      toast('ওয়ালেট যাচাই করা হয়েছে');
+      if(currentPage==='wallets') loadWallets(true);
+      const u = allUsersCache.find(x=>x.id===uid);
+      if(u) u[field+'Verified'] = true;
+      if(document.getElementById('ud-wallets')) loadUserWallets(uid);
+    }catch(e){ console.error(e); toast('যাচাই করা যায়নি'); }
+  });
+}
+
+async function resetWallet(uid, field){
+  confirmAction('ওয়ালেট রিসেট করবেন?', 'ইউজার নতুন করে একটা নম্বর সেট করতে পারবে। ভুল নম্বর ঠিক করার ক্ষেত্রে এটা ব্যবহার করুন।', async ()=>{
+    const fb = window.apexifyAdminFB;
+    await fb.updateDoc(fb.doc(fb.db,'users',uid), {[field+'Number']: null, [field+'Verified']: false});
+    const u = allUsersCache.find(x=>x.id===uid);
+    if(u){ u[field+'Number'] = null; u[field+'Verified'] = false; }
+    toast('ওয়ালেট রিসেট করা হয়েছে');
+    loadUserWallets(uid);
+    if(currentPage==='wallets') loadWallets(true);
+  }, 'রিসেট করুন', true);
+}
+
+async function saveUserStatus(uid, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const status = document.getElementById('ud-status').value;
+    try{
+      const patch = {status, updatedAt: fb.serverTimestamp()};
+      if(status==='active') patch.activatedAt = fb.serverTimestamp();
+      await fb.updateDoc(fb.doc(fb.db,'users',uid), patch);
+      try{ await fb.updateDoc(fb.doc(fb.db,'publicProfiles',uid), {status}); }catch(e){}
+
+      if(status==='active'){
+        try{ await creditReferralIfDue(uid); }catch(e){ console.warn('Referral credit on manual activation failed', e); }
+      }
+
+      toast('স্ট্যাটাস আপডেট হয়েছে');
+      closeModal();
+      loadUsers(true);
+    }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে'); }
+  });
+}
+
+// Shared helper: credits the referrer of `uid` exactly once, if `uid` has an
+// un-rewarded referrer. Safe to call from any activation path (request-approval
+// or manual status change) — the referralRewarded flag prevents double-payment.
+async function creditReferralIfDue(uid){
+  const fb = window.apexifyAdminFB;
+  let settingsCommission = 15;
+  try{
+    const setSnap = await fb.getDoc(fb.doc(fb.db,'settings','config'));
+    if(setSnap.exists() && setSnap.data().referralCommission != null) settingsCommission = Number(setSnap.data().referralCommission);
+  }catch(e){}
+
+  let referrerCredited = null;
+  await fb.runTransaction(fb.db, async tx=>{
+    const userRef = fb.doc(fb.db,'users', uid);
+    const userSnap = await tx.get(userRef);
+    if(!userSnap.exists()) return;
+    const u = userSnap.data();
+    if(!u.referrerUid || u.referralRewarded === true) return;
+
+    const refRef = fb.doc(fb.db,'users', u.referrerUid);
+    const refSnap = await tx.get(refRef);
+    if(!refSnap.exists()) return;
+    const refPubRef = fb.doc(fb.db,'publicProfiles', u.referrerUid);
+    const refPubSnap = await tx.get(refPubRef);
+
+    const r = refSnap.data();
+    tx.update(refRef, {
+      referralBalance: Number(r.referralBalance||0)+settingsCommission,
+      mainBalance: Number(r.mainBalance||0)+settingsCommission,
+      totalRevenue: Number(r.totalRevenue||0)+settingsCommission,
+      referralCount: Number(r.referralCount||0)+1,
+      updatedAt: fb.serverTimestamp()
+    });
+    tx.update(userRef, {referralRewarded:true});
+    if(refPubSnap.exists()){
+      tx.update(refPubRef, {referralCount: Number(refPubSnap.data().referralCount||0)+1});
+    }
+    const notifRef = fb.doc(fb.collection(fb.db,'users', u.referrerUid, 'notifications'));
+    tx.set(notifRef, {
+      title:'নতুন রেফারেল কমিশন',
+      body:`আপনি ৳${settingsCommission} রেফারেল কমিশন পেয়েছেন`,
+      type:'referral', read:false, createdAt: fb.serverTimestamp()
+    });
+    referrerCredited = u.referrerUid;
+  });
+
+  if(referrerCredited){
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {
+      uid:referrerCredited, type:'referral', title:'রেফারেল কমিশন', amount:settingsCommission, sourceUid:uid, createdAt: fb.serverTimestamp()
+    });
+  }
+  return referrerCredited;
+}
+async function saveUserBalances(uid, btn){
+  const err = document.getElementById('ud-err');
+  const fields = ['mainBalance','salaryBalance','referralBalance','depositBalance','totalRevenue'];
+  const patch = {};
+  for(const f of fields){
+    const v = Number(document.getElementById('ud-'+f).value);
+    if(isNaN(v)){ err.textContent='সঠিক সংখ্যা দিন'; return; }
+    patch[f]=v;
+  }
+  err.textContent='';
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'users',uid), {...patch, updatedAt: fb.serverTimestamp()});
+      toast('ব্যালেন্স আপডেট হয়েছে');
+      closeModal();
+      loadUsers(true);
+    }catch(e){ console.error(e); err.textContent='সংরক্ষণ ব্যর্থ হয়েছে'; }
+  });
+}
+
+/* ---------------- DEPOSITS ---------------- */
+async function loadDeposits(force){
+  const fb = window.apexifyAdminFB;
+  if(force || depositsCache.__filter !== depositsFilter){
+    document.getElementById('deposits-tbody').innerHTML = `<tr><td class="empty-row" colspan="7"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(depositsFilter==='all') q = fb.query(fb.collection(fb.db,'depositRequests'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'depositRequests'), fb.where('status','==',depositsFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      depositsCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      depositsCache.__filter = depositsFilter;
+    }catch(e){ console.error(e); toast('ডিপোজিট লোড করা যায়নি'); }
+  }
+  renderDepositsTable();
+}
+function setDepositFilter(f){
+  depositsFilter=f;
+  document.querySelectorAll('#deposit-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadDeposits(true);
+}
+function renderDepositsTable(){
+  const tbody = document.getElementById('deposits-tbody');
+  if(depositsCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="7">কোনো রিকোয়েস্ট নেই</td></tr>`; return; }
+  tbody.innerHTML = depositsCache.map(d=>`
+    <tr>
+      <td class="cell-name">${esc(d.method||'—')}</td>
+      <td style="font-weight:700">${fmt(d.amount)}</td>
+      <td class="mono">${esc(d.transactionId||'—')}</td>
+      <td class="mono">${esc(d.senderNumber||'—')}</td>
+      <td>${reqStatusChip(d.status)}</td>
+      <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+      <td class="row-actions">
+        ${d.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveDeposit('${d.id}')">অনুমোদন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectDeposit('${d.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+function reqStatusChip(s){
+  if(s==='approved') return `<span class="chip ok">অনুমোদিত</span>`;
+  if(s==='rejected') return `<span class="chip bad">বাতিল</span>`;
+  return `<span class="chip warn">পেন্ডিং</span>`;
+}
+function approveDeposit(id){
+  const d = depositsCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('ডিপোজিট অনুমোদন করবেন?', `${fmt(d.amount)} টাকা ইউজারের ডিপোজিট ব্যালেন্সে যোগ হবে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'depositRequests', id);
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(reqRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      tx.update(userRef, {depositBalance: fb.increment(Number(data.amount||0)), updatedAt: fb.serverTimestamp()});
+      tx.update(reqRef, {status:'approved', processedAt: fb.serverTimestamp()});
+    });
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {
+      uid:d.uid, type:'deposit', title:'ডিপোজিট অনুমোদিত', amount:Number(d.amount||0), createdAt: fb.serverTimestamp()
+    });
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'ডিপোজিট অনুমোদিত হয়েছে', body:`৳${d.amount} আপনার ডিপোজিট ব্যালেন্সে যোগ হয়েছে`, type:'deposit', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('ডিপোজিট অনুমোদন করা হয়েছে');
+    loadDeposits(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'অনুমোদন করুন');
+}
+function rejectDeposit(id){
+  const d = depositsCache.find(x=>x.id===id);
+  confirmAction('ডিপোজিট বাতিল করবেন?', 'এই রিকোয়েস্টটি বাতিল করা হবে, কোনো ব্যালেন্স যোগ হবে না।', async ()=>{
+    const fb = window.apexifyAdminFB;
+    await fb.updateDoc(fb.doc(fb.db,'depositRequests', id), {status:'rejected', processedAt: fb.serverTimestamp()});
+    if(d) try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'ডিপোজিট বাতিল হয়েছে', body:`আপনার ৳${d.amount} ডিপোজিট রিকোয়েস্টটি বাতিল করা হয়েছে`, type:'deposit', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('রিকোয়েস্ট বাতিল করা হয়েছে');
+    loadDeposits(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- ACTIVATIONS ---------------- */
+async function loadActivations(force){
+  const fb = window.apexifyAdminFB;
+  if(force || activationsCache.__filter !== activationsFilter){
+    document.getElementById('activations-tbody').innerHTML = `<tr><td class="empty-row" colspan="4"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(activationsFilter==='all') q = fb.query(fb.collection(fb.db,'subscriptionRequests'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'subscriptionRequests'), fb.where('status','==',activationsFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      activationsCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      activationsCache.__filter = activationsFilter;
+    }catch(e){ console.error(e); toast('অ্যাক্টিভেশন লোড করা যায়নি'); }
+  }
+  renderActivationsTable();
+}
+function setActivationFilter(f){
+  activationsFilter=f;
+  document.querySelectorAll('#activation-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadActivations(true);
+}
+function renderActivationsTable(){
+  const tbody = document.getElementById('activations-tbody');
+  if(activationsCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="4">কোনো রিকোয়েস্ট নেই</td></tr>`; return; }
+  tbody.innerHTML = activationsCache.map(d=>`
+    <tr>
+      <td style="font-weight:700">${fmt(d.activationFee||d.amount)}</td>
+      <td>${reqStatusChip(d.status)}</td>
+      <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+      <td class="row-actions">
+        ${d.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveActivation('${d.id}')">অনুমোদন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectActivation('${d.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+function approveActivation(id){
+  const d = activationsCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('অ্যাক্টিভেশন অনুমোদন করবেন?', `ফি (${fmt(d.activationFee||d.amount)}) ইতিমধ্যে কেটে রাখা হয়েছে — একাউন্ট সক্রিয় করা হবে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'subscriptionRequests', id);
+
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(reqRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      const userSnap = await tx.get(userRef);
+      if(!userSnap.exists()) throw new Error('user-missing');
+      const pubRef = fb.doc(fb.db,'publicProfiles', data.uid);
+      const pubSnap = await tx.get(pubRef);
+
+      tx.update(userRef, {status:'active', activatedAt: fb.serverTimestamp(), updatedAt: fb.serverTimestamp()});
+      tx.update(reqRef, {status:'approved', processedAt: fb.serverTimestamp()});
+      if(pubSnap.exists()) tx.update(pubRef, {status:'active'});
+    });
+
+    let referrerCredited = null;
+    try{ referrerCredited = await creditReferralIfDue(d.uid); }catch(e){ console.warn('Referral credit on activation approval failed', e); }
+
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'একাউন্ট সক্রিয় হয়েছে', body:'আপনার একাউন্ট এখন সম্পূর্ণ সক্রিয়, সব ফিচার আনলক হয়েছে', type:'activation', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast(referrerCredited ? 'একাউন্ট সক্রিয় করা হয়েছে ও রেফারেল কমিশন পাঠানো হয়েছে' : 'একাউন্ট সক্রিয় করা হয়েছে');
+    loadActivations(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'অনুমোদন করুন');
+}
+function rejectActivation(id){
+  const d = activationsCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('অ্যাক্টিভেশন বাতিল করবেন?', `কাটা ফি (${fmt(d.activationFee||d.amount)}) ইউজারের ডিপোজিট ব্যালেন্সে ফেরত দেওয়া হবে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'subscriptionRequests', id);
+    const fee = Number(d.activationFee||d.amount||0);
+
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(reqRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      tx.update(userRef, {depositBalance: fb.increment(fee), updatedAt: fb.serverTimestamp()});
+      tx.update(reqRef, {status:'rejected', processedAt: fb.serverTimestamp()});
+    });
+
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {
+      uid:d.uid, type:'activation', title:'অ্যাক্টিভেশন ফি ফেরত', amount:fee, createdAt: fb.serverTimestamp()
+    });
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'অ্যাক্টিভেশন বাতিল হয়েছে', body:`আপনার অ্যাক্টিভেশন রিকোয়েস্টটি বাতিল করা হয়েছে, ৳${fee} ফেরত দেওয়া হয়েছে`, type:'activation', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('রিকোয়েস্ট বাতিল করা হয়েছে, টাকা ফেরত দেওয়া হয়েছে');
+    loadActivations(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- SALARY REQUESTS ---------------- */
+async function loadSalaryRequests(force){
+  const fb = window.apexifyAdminFB;
+  if(force || salaryCache.__filter !== salaryFilter){
+    document.getElementById('salary-tbody').innerHTML = `<tr><td class="empty-row" colspan="6"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(salaryFilter==='all') q = fb.query(fb.collection(fb.db,'salaryRequests'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'salaryRequests'), fb.where('status','==',salaryFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      salaryCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      salaryCache.__filter = salaryFilter;
+    }catch(e){ console.error(e); toast('স্যালারি রিকোয়েস্ট লোড করা যায়নি'); }
+  }
+  renderSalaryTable();
+}
+function setSalaryFilter(f){
+  salaryFilter=f;
+  document.querySelectorAll('#salary-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadSalaryRequests(true);
+}
+function renderSalaryTable(){
+  const tbody = document.getElementById('salary-tbody');
+  if(salaryCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="6">কোনো রিকোয়েস্ট নেই</td></tr>`; return; }
+  tbody.innerHTML = salaryCache.map(d=>`
+    <tr>
+      <td class="mono">${esc(d.month||'—')}</td>
+      <td style="font-weight:700">${fmt(d.amount)}</td>
+      <td class="cell-mute">${Number(d.activeAtRequest||0)} জন</td>
+      <td>${reqStatusChip(d.status)}</td>
+      <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+      <td class="row-actions">
+        ${d.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveSalary('${d.id}')">অনুমোদন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectSalary('${d.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+function approveSalary(id){
+  const d = salaryCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('স্যালারি অনুমোদন করবেন?', `${fmt(d.amount)} টাকা ইউজারের স্যালারি ব্যালেন্সে যোগ হবে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'salaryRequests', id);
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(reqRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      tx.update(userRef, {
+        salaryBalance: fb.increment(Number(data.amount||0)),
+        mainBalance: fb.increment(Number(data.amount||0)),
+        totalRevenue: fb.increment(Number(data.amount||0)),
+        updatedAt: fb.serverTimestamp()
+      });
+      tx.update(reqRef, {status:'approved', processedAt: fb.serverTimestamp()});
+    });
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {uid:d.uid, type:'salary', title:'ফিক্সড স্যালারি', amount:Number(d.amount||0), createdAt: fb.serverTimestamp()});
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'স্যালারি অনুমোদিত হয়েছে', body:`৳${d.amount} আপনার ব্যালেন্সে যোগ হয়েছে`, type:'salary', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('স্যালারি অনুমোদন করা হয়েছে');
+    loadSalaryRequests(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'অনুমোদন করুন');
+}
+function rejectSalary(id){
+  const d = salaryCache.find(x=>x.id===id);
+  confirmAction('স্যালারি রিকোয়েস্ট বাতিল করবেন?', 'এই রিকোয়েস্টটি বাতিল করা হবে।', async ()=>{
+    const fb = window.apexifyAdminFB;
+    await fb.updateDoc(fb.doc(fb.db,'salaryRequests', id), {status:'rejected', processedAt: fb.serverTimestamp()});
+    if(d) try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'স্যালারি রিকোয়েস্ট বাতিল হয়েছে', body:'আপনার স্যালারি রিকোয়েস্টটি বাতিল করা হয়েছে', type:'salary', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('রিকোয়েস্ট বাতিল করা হয়েছে');
+    loadSalaryRequests(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- INVESTMENT PACKAGES ---------------- */
+async function loadPackages(force){
+  const fb = window.apexifyAdminFB;
+  if(force || packagesCache.length===0){
+    document.getElementById('packages-tbody').innerHTML = `<tr><td class="empty-row" colspan="7"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      const snap = await fb.getDocs(fb.collection(fb.db,'investmentPackages'));
+      packagesCache = snap.docs.map(s=>({id:s.id, ...s.data()}))
+        .sort((a,b)=>Number(a.price||0)-Number(b.price||0));
+    }catch(e){ console.error(e); toast('প্যাকেজ লোড করা যায়নি'); }
+  }
+  renderPackagesTable();
+}
+function renderPackagesTable(){
+  const tbody = document.getElementById('packages-tbody');
+  if(packagesCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="7">কোনো প্যাকেজ নেই</td></tr>`; return; }
+  tbody.innerHTML = packagesCache.map(p=>`
+    <tr>
+      <td class="cell-name">${esc(p.name)}</td>
+      <td style="font-weight:700">${fmt(p.price)}</td>
+      <td class="cell-mute">${p.durationDays} দিন</td>
+      <td class="cell-mute">${fmt(p.dailyIncome)}/দিন</td>
+      <td style="font-weight:700; color:var(--ok)">${fmt(Number(p.dailyIncome||0)*Number(p.durationDays||0))}</td>
+      <td>${p.active===false ? `<span class="chip bad">বন্ধ</span>` : `<span class="chip ok">সক্রিয়</span>`}</td>
+      <td class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openCreatePackageModal('${esc(p.id)}')">এডিট</button>
+        <button class="btn btn-ghost btn-sm" onclick="togglePackageActive('${esc(p.id)}',${p.active===false},this)">${p.active===false?'চালু':'বন্ধ'}</button>
+      </td>
+    </tr>`).join('');
+}
+function openCreatePackageModal(editId){
+  const existing = editId ? packagesCache.find(p=>p.id===editId) : null;
+  openModal(`
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box" style="max-width:400px">
+      <h3>${existing?'প্যাকেজ এডিট করুন':'নতুন প্যাকেজ'}</h3>
+      <p class="desc">ইউজাররা ডিপোজিট ব্যালেন্স দিয়ে এই প্যাকেজ কিনবে এবং প্রতিদিন আয় পাবে।</p>
+      <div class="field"><label>প্যাকেজের নাম</label><div class="field-input"><input id="pk-name" placeholder="যেমন: স্টার্টার প্ল্যান" value="${existing?esc(existing.name):''}"></div></div>
+      <div class="grid-2">
+        <div class="field"><label>দাম (৳)</label><div class="field-input"><input id="pk-price" type="number" min="1" value="${existing?Number(existing.price):500}"></div></div>
+        <div class="field"><label>মেয়াদ (দিন)</label><div class="field-input"><input id="pk-duration" type="number" min="1" value="${existing?Number(existing.durationDays):15}"></div></div>
+      </div>
+      <div class="field"><label>দৈনিক আয় (৳)</label><div class="field-input"><input id="pk-daily" type="number" min="1" value="${existing?Number(existing.dailyIncome):50}"></div></div>
+      <div class="err-msg" id="pk-err"></div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">বাতিল</button>
+        <button class="btn btn-primary" style="flex:1" onclick="savePackage(${existing?`'${esc(existing.id)}'`:'null'},this)">${existing?'সংরক্ষণ করুন':'তৈরি করুন'}</button>
+      </div>
+    </div>
+  </div>`);
+}
+async function savePackage(editId, btn){
+  const err = document.getElementById('pk-err');
+  const name = document.getElementById('pk-name').value.trim();
+  const price = Number(document.getElementById('pk-price').value);
+  const durationDays = Number(document.getElementById('pk-duration').value);
+  const dailyIncome = Number(document.getElementById('pk-daily').value);
+  if(!name){ err.textContent='নাম লিখুন'; return; }
+  if(!price || price<=0){ err.textContent='সঠিক দাম দিন'; return; }
+  if(!durationDays || durationDays<=0){ err.textContent='সঠিক মেয়াদ দিন'; return; }
+  if(!dailyIncome || dailyIncome<=0){ err.textContent='সঠিক দৈনিক আয় দিন'; return; }
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      const payload = {name, price, durationDays, dailyIncome, active:true};
+      if(editId){
+        await fb.updateDoc(fb.doc(fb.db,'investmentPackages',editId), payload);
+      }else{
+        payload.createdAt = fb.serverTimestamp();
+        await fb.addDoc(fb.collection(fb.db,'investmentPackages'), payload);
+      }
+      toast(editId?'প্যাকেজ আপডেট হয়েছে':'প্যাকেজ তৈরি হয়েছে');
+      closeModal();
+      loadPackages(true);
+    }catch(e){ console.error(e); err.textContent='সংরক্ষণ ব্যর্থ হয়েছে'; }
+  });
+}
+async function togglePackageActive(id, makeActive, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'investmentPackages',id), {active: makeActive});
+      toast(makeActive ? 'প্যাকেজ চালু করা হয়েছে' : 'প্যাকেজ বন্ধ করা হয়েছে');
+      loadPackages(true);
+    }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে'); }
+  });
+}
+
+/* ---------------- TASK MANAGEMENT ---------------- */
+async function loadTasksAdmin(force){
+  const fb = window.apexifyAdminFB;
+  if(force || tasksAdminCache.length===0){
+    document.getElementById('tasks-tbody').innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      const snap = await fb.getDocs(fb.collection(fb.db,'tasks'));
+      tasksAdminCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+    }catch(e){ console.error(e); toast('টাস্ক লোড করা যায়নি'); }
+  }
+  renderTasksAdminTable();
+}
+function renderTasksAdminTable(){
+  const tbody = document.getElementById('tasks-tbody');
+  if(tasksAdminCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো টাস্ক নেই</td></tr>`; return; }
+  tbody.innerHTML = tasksAdminCache.map(t=>`
+    <tr>
+      <td class="cell-name">${esc(t.title)}</td>
+      <td style="font-weight:700">${fmt(t.reward)}</td>
+      <td class="cell-mute">${Number(t.completedCount||0)} / ${t.maxWorkers ?? '∞'}</td>
+      <td>${t.active===false ? `<span class="chip bad">বন্ধ</span>` : `<span class="chip ok">সক্রিয়</span>`}</td>
+      <td class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openCreateTaskModal('${esc(t.id)}')">এডিট</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleTaskActive('${esc(t.id)}',${t.active===false},this)">${t.active===false?'চালু':'বন্ধ'}</button>
+      </td>
+    </tr>`).join('');
+}
+function openCreateTaskModal(editId){
+  const existing = editId ? tasksAdminCache.find(t=>t.id===editId) : null;
+  openModal(`
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box" style="max-width:420px">
+      <h3>${existing?'টাস্ক এডিট করুন':'নতুন টাস্ক'}</h3>
+      <p class="desc">ইউজাররা এই টাস্ক দেখতে ও লিংকে গিয়ে কাজ করে প্রমাণ জমা দিতে পারবে।</p>
+      <div class="field"><label>শিরোনাম</label><div class="field-input"><input id="tk-title" placeholder="যেমন: ফেসবুক পেজ লাইক করুন" value="${existing?esc(existing.title):''}"></div></div>
+      <div class="grid-2">
+        <div class="field"><label>রিওয়ার্ড (৳)</label><div class="field-input"><input id="tk-reward" type="number" min="1" value="${existing?Number(existing.reward):20}"></div></div>
+        <div class="field"><label>সর্বোচ্চ কতজন করতে পারবে (খালি = unlimited)</label><div class="field-input"><input id="tk-maxworkers" type="number" min="1" value="${existing&&existing.maxWorkers?Number(existing.maxWorkers):''}" placeholder="unlimited"></div></div>
+      </div>
+      <div class="field"><label>বিবরণ / নিয়মাবলী (ঐচ্ছিক)</label><div class="field-input"><input id="tk-desc" placeholder="টাস্কের বিস্তারিত নির্দেশনা" value="${existing?esc(existing.description||''):''}"></div></div>
+      <div class="field"><label>লিংক (ঐচ্ছিক)</label><div class="field-input"><input id="tk-link" placeholder="https://..." value="${existing?esc(existing.link||''):''}"></div></div>
+      <div class="err-msg" id="tk-err"></div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">বাতিল</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveTask(${existing?`'${esc(existing.id)}'`:'null'},this)">${existing?'সংরক্ষণ করুন':'তৈরি করুন'}</button>
+      </div>
+    </div>
+  </div>`);
+}
+async function saveTask(editId, btn){
+  const err = document.getElementById('tk-err');
+  const title = document.getElementById('tk-title').value.trim();
+  const description = document.getElementById('tk-desc').value.trim();
+  const link = document.getElementById('tk-link').value.trim();
+  const reward = Number(document.getElementById('tk-reward').value);
+  const maxWorkersRaw = document.getElementById('tk-maxworkers').value.trim();
+  if(!title){ err.textContent='শিরোনাম লিখুন'; return; }
+  if(!reward || reward<=0){ err.textContent='সঠিক রিওয়ার্ড দিন'; return; }
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      const payload = {title, description, link, reward, active:true};
+      if(maxWorkersRaw) payload.maxWorkers = Number(maxWorkersRaw);
+      if(editId){
+        await fb.updateDoc(fb.doc(fb.db,'tasks',editId), payload);
+      }else{
+        payload.completedCount = 0;
+        payload.createdAt = fb.serverTimestamp();
+        await fb.addDoc(fb.collection(fb.db,'tasks'), payload);
+      }
+      toast(editId?'টাস্ক আপডেট হয়েছে':'টাস্ক তৈরি হয়েছে');
+      closeModal();
+      loadTasksAdmin(true);
+    }catch(e){ console.error(e); err.textContent='সংরক্ষণ ব্যর্থ হয়েছে'; }
+  });
+}
+async function toggleTaskActive(id, makeActive, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'tasks',id), {active: makeActive});
+      toast(makeActive ? 'টাস্ক চালু করা হয়েছে' : 'টাস্ক বন্ধ করা হয়েছে');
+      loadTasksAdmin(true);
+    }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে'); }
+  });
+}
+
+/* ---------------- TASK SUBMISSIONS ---------------- */
+async function loadTaskSubmissions(force){
+  const fb = window.apexifyAdminFB;
+  if(force || taskSubCache.__filter !== taskSubFilter){
+    document.getElementById('tasksub-tbody').innerHTML = `<tr><td class="empty-row" colspan="6"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(taskSubFilter==='all') q = fb.query(fb.collection(fb.db,'taskSubmissions'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'taskSubmissions'), fb.where('status','==',taskSubFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      taskSubCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      taskSubCache.__filter = taskSubFilter;
+    }catch(e){ console.error(e); toast('সাবমিশন লোড করা যায়নি'); }
+  }
+  renderTaskSubTable();
+}
+function setTaskSubFilter(f){
+  taskSubFilter=f;
+  document.querySelectorAll('#tasksub-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadTaskSubmissions(true);
+}
+function renderTaskSubTable(){
+  const tbody = document.getElementById('tasksub-tbody');
+  if(taskSubCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="6">কোনো সাবমিশন নেই</td></tr>`; return; }
+  tbody.innerHTML = taskSubCache.map(s=>`
+    <tr>
+      <td class="cell-name">${esc(s.taskTitle||'—')}</td>
+      <td style="font-weight:700">${fmt(s.reward)}</td>
+      <td class="cell-mute" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.proof||'—')}</td>
+      <td>${reqStatusChip(s.status)}</td>
+      <td class="cell-mute">${fmtDate(s.createdAt)}</td>
+      <td class="row-actions">
+        ${s.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveTaskSubmission('${s.id}')">অনুমোদন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectTaskSubmission('${s.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+function approveTaskSubmission(id){
+  const s = taskSubCache.find(x=>x.id===id);
+  if(!s) return;
+  confirmAction('টাস্ক অনুমোদন করবেন?', `${fmt(s.reward)} টাকা ইউজারের মেইন ব্যালেন্সে যোগ হবে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const subRef = fb.doc(fb.db,'taskSubmissions', id);
+    const taskRef = fb.doc(fb.db,'tasks', s.taskId);
+
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(subRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      const userSnap = await tx.get(userRef);
+      if(!userSnap.exists()) throw new Error('user-missing');
+      const u = userSnap.data();
+      const taskSnap = await tx.get(taskRef);
+
+      tx.update(userRef, {
+        mainBalance: Number(u.mainBalance||0)+Number(data.reward||0),
+        totalRevenue: Number(u.totalRevenue||0)+Number(data.reward||0),
+        updatedAt: fb.serverTimestamp()
+      });
+      tx.update(subRef, {status:'approved', processedAt: fb.serverTimestamp()});
+      if(taskSnap.exists()){
+        tx.update(taskRef, {completedCount: Number(taskSnap.data().completedCount||0)+1});
+      }
+    });
+
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {
+      uid:s.uid, type:'task', title:`টাস্ক রিওয়ার্ড — ${s.taskTitle}`, amount:Number(s.reward||0), createdAt: fb.serverTimestamp()
+    });
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',s.uid,'notifications'), {title:'টাস্ক অনুমোদিত হয়েছে', body:`৳${s.reward} আপনার মেইন ব্যালেন্সে যোগ হয়েছে`, type:'task', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('টাস্ক অনুমোদন করা হয়েছে');
+    loadTaskSubmissions(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'অনুমোদন করুন');
+}
+function rejectTaskSubmission(id){
+  const s = taskSubCache.find(x=>x.id===id);
+  confirmAction('টাস্ক সাবমিশন বাতিল করবেন?', 'এই সাবমিশনটি বাতিল করা হবে, কোনো ব্যালেন্স যোগ হবে না।', async ()=>{
+    const fb = window.apexifyAdminFB;
+    await fb.updateDoc(fb.doc(fb.db,'taskSubmissions', id), {status:'rejected', processedAt: fb.serverTimestamp()});
+    if(s) try{
+      await fb.addDoc(fb.collection(fb.db,'users',s.uid,'notifications'), {title:'টাস্ক বাতিল হয়েছে', body:`আপনার "${s.taskTitle}" টাস্ক সাবমিশনটি বাতিল করা হয়েছে`, type:'task', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('সাবমিশন বাতিল করা হয়েছে');
+    loadTaskSubmissions(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- PASSWORD RESET REQUESTS ---------------- */
+async function loadPasswordResets(force){
+  const fb = window.apexifyAdminFB;
+  if(force || pwResetCache.__filter !== pwResetFilter){
+    document.getElementById('pwreset-tbody').innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(pwResetFilter==='all') q = fb.query(fb.collection(fb.db,'passwordResetRequests'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'passwordResetRequests'), fb.where('status','==',pwResetFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      pwResetCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      pwResetCache.__filter = pwResetFilter;
+    }catch(e){ console.error(e); toast('রিকোয়েস্ট লোড করা যায়নি'); }
+  }
+  renderPwResetTable();
+}
+function setPwResetFilter(f){
+  pwResetFilter=f;
+  document.querySelectorAll('#pwreset-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadPasswordResets(true);
+}
+function renderPwResetTable(){
+  const tbody = document.getElementById('pwreset-tbody');
+  if(pwResetCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো রিকোয়েস্ট নেই</td></tr>`; return; }
+  tbody.innerHTML = pwResetCache.map(r=>`
+    <tr>
+      <td class="mono" style="font-weight:700">${esc(r.phone)}</td>
+      <td class="cell-mute">${esc(r.note||'—')}</td>
+      <td class="cell-mute">${fmtDate(r.createdAt)}</td>
+      <td>${r.status==='resolved' ? `<span class="chip ok">সমাধান হয়েছে</span>` : `<span class="chip warn">পেন্ডিং</span>`}</td>
+      <td class="row-actions">
+        ${r.status!=='resolved' ? `<button class="btn btn-primary btn-sm" onclick="resolvePasswordReset('${r.id}',this)">সমাধান হয়েছে</button>` : `<span class="cell-mute">—</span>`}
+      </td>
+    </tr>`).join('');
+}
+async function resolvePasswordReset(id, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'passwordResetRequests', id), {status:'resolved', processedAt: fb.serverTimestamp()});
+      toast('সমাধান হিসেবে চিহ্নিত করা হয়েছে');
+      loadPasswordResets(true);
+    }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে'); }
+  });
+}
+
+/* ---------------- SELL SERVICE CONFIG ---------------- */
+async function loadSellConfig(force){
+  const fb = window.apexifyAdminFB;
+  if(force || Object.keys(sellConfigCache).length===0){
+    try{
+      const snap = await fb.getDocs(fb.collection(fb.db,'accountServices'));
+      const map = {};
+      snap.docs.forEach(s=>{ map[s.id]=s.data(); });
+      sellConfigCache = map;
+    }catch(e){ console.error(e); toast('কনফিগ লোড করা যায়নি'); }
+  }
+  renderSellConfigForm();
+}
+function setSellConfigTab(svc){
+  sellConfigTab = svc;
+  document.querySelectorAll('#sellconfig-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.svc===svc));
+  renderSellConfigForm();
+}
+function renderSellConfigForm(){
+  const c = sellConfigCache[sellConfigTab] || {};
+  document.getElementById('sc-rate').value = c.rate ?? '';
+  document.getElementById('sc-videoLink').value = c.videoLink ?? '';
+  document.getElementById('sc-requiredPassword').value = c.requiredPassword ?? '';
+}
+async function saveSellConfig(btn){
+  const err = document.getElementById('sc-err');
+  const rate = Number(document.getElementById('sc-rate').value);
+  const videoLink = document.getElementById('sc-videoLink').value.trim();
+  const requiredPassword = document.getElementById('sc-requiredPassword').value.trim();
+  if(isNaN(rate) || rate<0){ err.textContent='সঠিক রেট দিন'; return; }
+  err.textContent='';
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.setDoc(fb.doc(fb.db,'accountServices', sellConfigTab), {rate, videoLink, requiredPassword, active:true, updatedAt: fb.serverTimestamp()}, {merge:true});
+      sellConfigCache[sellConfigTab] = {rate, videoLink, requiredPassword, active:true};
+      toast('সংরক্ষণ করা হয়েছে');
+    }catch(e){ console.error(e); err.textContent='সংরক্ষণ ব্যর্থ হয়েছে'; }
+  });
+}
+
+/* ---------------- SELL SUBMISSIONS ---------------- */
+async function loadSellSubmissions(force){
+  const fb = window.apexifyAdminFB;
+  const cacheKey = sellSubServiceFilter+'|'+sellSubFilter;
+  if(force || sellSubCache.__key !== cacheKey){
+    document.getElementById('sellsub-tbody').innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(sellSubFilter==='all'){
+        q = fb.query(fb.collection(fb.db,'accountSubmissions'), fb.where('serviceType','==',sellSubServiceFilter), fb.orderBy('createdAt','desc'), fb.limit(300));
+      }else{
+        q = fb.query(fb.collection(fb.db,'accountSubmissions'), fb.where('serviceType','==',sellSubServiceFilter), fb.where('status','==',sellSubFilter), fb.orderBy('createdAt','desc'), fb.limit(300));
+      }
+      const snap = await fb.getDocs(q);
+      sellSubCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      sellSubCache.__key = cacheKey;
+    }catch(e){ console.error(e); toast('সাবমিশন লোড করা যায়নি'); }
+  }
+  renderSellSubTable();
+}
+function setSellSubService(svc){
+  sellSubServiceFilter = svc;
+  document.querySelectorAll('#sellsub-service-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.svc===svc));
+  loadSellSubmissions(true);
+}
+function setSellSubFilter(f){
+  sellSubFilter=f;
+  document.querySelectorAll('#sellsub-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadSellSubmissions(true);
+}
+function sellSubSummary(s){
+  const d = s.data||{};
+  if(s.serviceType==='gmail') return esc(d.email||'—') + ' = ' + esc(d.password||'—');
+  if(s.serviceType==='facebook') return esc(d.uid||'—') + ' = ' + esc(d.password||'—') + ' = ' + esc(d.cookies||'—');
+  if(s.serviceType==='instagram') return esc(d.username||'—') + ' = ' + esc(d.password||'—') + ' = ' + esc(d.twoFA||'—');
+  return '—';
+}
+function renderSellSubTable(){
+  const tbody = document.getElementById('sellsub-tbody');
+  if(sellSubCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো সাবমিশন নেই</td></tr>`; return; }
+  tbody.innerHTML = sellSubCache.map(s=>`
+    <tr>
+      <td class="cell-mute mono">${sellSubSummary(s)}</td>
+      <td style="font-weight:700">${fmt(s.rate)}</td>
+      <td>${reqStatusChip(s.status)}</td>
+      <td class="cell-mute">${fmtDate(s.createdAt)}</td>
+      <td class="row-actions">
+        ${s.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveSellSubmission('${s.id}')">অনুমোদন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectSellSubmission('${s.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+
+async function processSellSubmissionStatus(id, newStatus){
+  const fb = window.apexifyAdminFB;
+  const subRef = fb.doc(fb.db,'accountSubmissions', id);
+  let result = 'skip';
+  await fb.runTransaction(fb.db, async tx=>{
+    const snap = await tx.get(subRef);
+    if(!snap.exists() || snap.data().status!=='pending') return;
+    const data = snap.data();
+    let userSnap = null, userRef = null;
+    if(newStatus==='approved'){
+      userRef = fb.doc(fb.db,'users', data.uid);
+      userSnap = await tx.get(userRef);
+      if(!userSnap.exists()) return;
+    }
+    if(newStatus==='approved'){
+      const u = userSnap.data();
+      tx.update(userRef, {
+        mainBalance: Number(u.mainBalance||0)+Number(data.rate||0),
+        totalRevenue: Number(u.totalRevenue||0)+Number(data.rate||0),
+        updatedAt: fb.serverTimestamp()
+      });
+    }
+    tx.update(subRef, {status:newStatus, processedAt: fb.serverTimestamp()});
+    result = {uid:data.uid, rate:Number(data.rate||0), serviceName:data.serviceName};
+  });
+  if(result && result!=='skip'){
+    if(newStatus==='approved'){
+      await fb.addDoc(fb.collection(fb.db,'transactions'), {uid:result.uid, type:'account_sale', title:`একাউন্ট বিক্রয় — ${result.serviceName}`, amount:result.rate, createdAt: fb.serverTimestamp()});
+      try{ await fb.addDoc(fb.collection(fb.db,'users',result.uid,'notifications'), {title:'একাউন্ট সাবমিশন অনুমোদিত', body:`৳${result.rate} আপনার ব্যালেন্সে যোগ হয়েছে`, type:'sell', read:false, createdAt: fb.serverTimestamp()}); }catch(e){}
+    }else{
+      try{ await fb.addDoc(fb.collection(fb.db,'users',result.uid,'notifications'), {title:'একাউন্ট সাবমিশন বাতিল', body:`আপনার "${result.serviceName}" সাবমিশনটি বাতিল করা হয়েছে`, type:'sell', read:false, createdAt: fb.serverTimestamp()}); }catch(e){}
+    }
+  }
+  return result;
+}
+
+function approveSellSubmission(id){
+  confirmAction('সাবমিশন অনুমোদন করবেন?', 'ইউজারের মেইন ব্যালেন্সে রেট অনুযায়ী টাকা যোগ হবে।', async ()=>{
+    await processSellSubmissionStatus(id, 'approved');
+    toast('অনুমোদন করা হয়েছে');
+    loadSellSubmissions(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'অনুমোদন করুন');
+}
+function rejectSellSubmission(id){
+  confirmAction('সাবমিশন বাতিল করবেন?', 'কোনো ব্যালেন্স যোগ হবে না।', async ()=>{
+    await processSellSubmissionStatus(id, 'rejected');
+    toast('বাতিল করা হয়েছে');
+    loadSellSubmissions(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- CSV BULK EXPORT / IMPORT ---------------- */
+function csvEscape(val){
+  const s = String(val==null?'':val);
+  if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+async function downloadSellSubmissionsCSV(){
+  const fb = window.apexifyAdminFB;
+  toast('তৈরি হচ্ছে...');
+  try{
+    const snap = await fb.getDocs(fb.collection(fb.db,'accountSubmissions'));
+    const rows = [['id','serviceType','sellerUid','rate','status','createdAt','email','password','fb_uid','cookies','username','twoFA']];
+    snap.docs.forEach(s=>{
+      const d = s.data();
+      const f = d.data||{};
+      rows.push([
+        s.id, d.serviceType||'', d.uid||'', d.rate||0, d.status||'',
+        d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : '',
+        f.email||'', f.password||'', f.uid||'', f.cookies||'', f.username||'', f.twoFA||''
+      ]);
+    });
+    const csv = rows.map(r=>r.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'sell-submissions-'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('ডাউনলোড হয়েছে');
+  }catch(e){ console.error(e); toast('ডাউনলোড ব্যর্থ হয়েছে'); }
+}
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else inQuotes=false; }
+      else field+=c;
+    }else{
+      if(c==='"') inQuotes=true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\r'){ /* skip */ }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else field+=c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.length>1 || r[0]!=='');
+}
+async function uploadSellSubmissionsCSV(input){
+  const file = input.files[0];
+  if(!file) return;
+  const text = await file.text();
+  const rows = parseCSV(text);
+  if(rows.length<2){ toast('ফাইলে কোনো ডেটা নেই'); input.value=''; return; }
+  const header = rows[0];
+  const idIdx = header.indexOf('id');
+  const statusIdx = header.indexOf('status');
+  if(idIdx===-1 || statusIdx===-1){ toast('CSV ফরম্যাট সঠিক না — id ও status কলাম দরকার'); input.value=''; return; }
+
+  let approved=0, rejected=0, skipped=0;
+  toast('প্রসেস হচ্ছে, অপেক্ষা করুন...');
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    const id = (r[idIdx]||'').trim();
+    const status = (r[statusIdx]||'').trim().toLowerCase();
+    if(!id || (status!=='approved' && status!=='rejected')){ skipped++; continue; }
+    try{
+      const result = await processSellSubmissionStatus(id, status);
+      if(!result || result==='skip') skipped++;
+      else if(status==='approved') approved++;
+      else rejected++;
+    }catch(e){ console.warn('Row failed', id, e); skipped++; }
+  }
+  input.value = '';
+  toast(`সম্পন্ন — ${approved} অনুমোদিত, ${rejected} বাতিল, ${skipped} স্কিপ`);
+  loadSellSubmissions(true);
+  if(currentPage==='dashboard') loadDashboard();
+}
+
+/* ---------------- WITHDRAWALS ---------------- */
+async function loadWithdrawals(force){
+  const fb = window.apexifyAdminFB;
+  if(force || withdrawalsCache.__filter !== withdrawalsFilter){
+    document.getElementById('withdrawals-tbody').innerHTML = `<tr><td class="empty-row" colspan="7"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      let q;
+      if(withdrawalsFilter==='all') q = fb.query(fb.collection(fb.db,'withdrawalRequests'), fb.orderBy('createdAt','desc'), fb.limit(200));
+      else q = fb.query(fb.collection(fb.db,'withdrawalRequests'), fb.where('status','==',withdrawalsFilter), fb.orderBy('createdAt','desc'), fb.limit(200));
+      const snap = await fb.getDocs(q);
+      withdrawalsCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+      withdrawalsCache.__filter = withdrawalsFilter;
+    }catch(e){ console.error(e); toast('উইথড্র লোড করা যায়নি'); }
+  }
+  renderWithdrawalsTable();
+}
+function setWithdrawalFilter(f){
+  withdrawalsFilter=f;
+  document.querySelectorAll('#withdrawal-status-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===f));
+  loadWithdrawals(true);
+}
+function renderWithdrawalsTable(){
+  const tbody = document.getElementById('withdrawals-tbody');
+  if(withdrawalsCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="7">কোনো রিকোয়েস্ট নেই</td></tr>`; return; }
+  tbody.innerHTML = withdrawalsCache.map(d=>`
+    <tr>
+      <td style="font-weight:700">${fmt(d.amount)}</td>
+      <td class="cell-mute">${fmt(d.fee)}</td>
+      <td style="font-weight:700; color:var(--ok)">${fmt(d.netAmount)}</td>
+      <td class="mono">${esc(d.walletType||'')} · ${esc(d.walletNumber||'')}</td>
+      <td>${reqStatusChip(d.status)}</td>
+      <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+      <td class="row-actions">
+        ${d.status==='pending' ? `
+          <button class="btn btn-primary btn-sm" onclick="approveWithdrawal('${d.id}')">সম্পন্ন করুন</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal('${d.id}')">বাতিল</button>
+        ` : `<span class="cell-mute">প্রসেসকৃত</span>`}
+      </td>
+    </tr>`).join('');
+}
+function approveWithdrawal(id){
+  const d = withdrawalsCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('উইথড্র সম্পন্ন করবেন?', `নিশ্চিত করুন যে আপনি ম্যানুয়ালি ${fmt(d.netAmount)} টাকা ${esc(d.walletType)} নম্বরে পাঠিয়েছেন। ব্যালেন্স আগেই কেটে রাখা হয়েছে।`, async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'withdrawalRequests', id);
+    const snap = await fb.getDoc(reqRef);
+    if(!snap.exists() || snap.data().status!=='pending'){ toast('ইতিমধ্যে প্রসেস করা হয়েছে'); loadWithdrawals(true); return; }
+    await fb.updateDoc(reqRef, {status:'approved', processedAt: fb.serverTimestamp()});
+    await fb.addDoc(fb.collection(fb.db,'transactions'), {uid:d.uid, type:'withdraw', title:'উইথড্র সম্পন্ন', amount:-Number(d.amount||0), createdAt: fb.serverTimestamp()});
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'উইথড্র সম্পন্ন হয়েছে', body:`৳${d.netAmount} আপনার ${d.walletType}-এ পাঠানো হয়েছে`, type:'withdraw', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('উইথড্র সম্পন্ন করা হয়েছে');
+    loadWithdrawals(true);
+    if(currentPage==='dashboard') loadDashboard();
+  }, 'সম্পন্ন করুন');
+}
+function rejectWithdrawal(id){
+  const d = withdrawalsCache.find(x=>x.id===id);
+  if(!d) return;
+  confirmAction('উইথড্র বাতিল করবেন?', 'কাটা ব্যালেন্স ইউজারের একাউন্টে ফেরত দেওয়া হবে।', async ()=>{
+    const fb = window.apexifyAdminFB;
+    const reqRef = fb.doc(fb.db,'withdrawalRequests', id);
+    await fb.runTransaction(fb.db, async tx=>{
+      const snap = await tx.get(reqRef);
+      if(!snap.exists() || snap.data().status!=='pending') throw new Error('already-processed');
+      const data = snap.data();
+      const userRef = fb.doc(fb.db,'users', data.uid);
+      tx.update(userRef, {mainBalance: fb.increment(Number(data.amount||0)), updatedAt: fb.serverTimestamp()});
+      tx.update(reqRef, {status:'rejected', processedAt: fb.serverTimestamp()});
+    });
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',d.uid,'notifications'), {title:'উইথড্র বাতিল হয়েছে', body:`৳${d.amount} আপনার ব্যালেন্সে ফেরত দেওয়া হয়েছে`, type:'withdraw', read:false, createdAt: fb.serverTimestamp()});
+    }catch(e){}
+    toast('উইথড্র বাতিল করা হয়েছে, ব্যালেন্স ফেরত দেওয়া হয়েছে');
+    loadWithdrawals(true);
+  }, 'বাতিল করুন', true);
+}
+
+/* ---------------- REDEEM CODES ---------------- */
+async function loadRedeemCodes(force){
+  const fb = window.apexifyAdminFB;
+  if(force || codesCache.length===0){
+    document.getElementById('codes-tbody').innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      const snap = await fb.getDocs(fb.collection(fb.db,'redeemCodes'));
+      codesCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+    }catch(e){ console.error(e); toast('কোড লোড করা যায়নি'); }
+  }
+  renderCodesTable();
+}
+function renderCodesTable(){
+  const tbody = document.getElementById('codes-tbody');
+  if(codesCache.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো কোড নেই</td></tr>`; return; }
+  tbody.innerHTML = codesCache.map(c=>`
+    <tr>
+      <td class="mono" style="font-weight:700">${esc(c.id)}</td>
+      <td style="font-weight:700">${fmt(c.amount)}</td>
+      <td class="cell-mute">${Number(c.usedCount||0)} / ${c.maxUses ?? '∞'}</td>
+      <td>${c.active===false ? `<span class="chip bad">বন্ধ</span>` : `<span class="chip ok">সক্রিয়</span>`}</td>
+      <td class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="toggleCodeActive('${esc(c.id)}',${c.active===false},this)">${c.active===false?'চালু করুন':'বন্ধ করুন'}</button>
+      </td>
+    </tr>`).join('');
+}
+function openCreateCodeModal(){
+  openModal(`
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box" style="max-width:380px">
+      <h3>নতুন রিডিম কোড</h3>
+      <p class="desc">কোডটি বড় হাতের অক্ষরে সংরক্ষিত হবে।</p>
+      <div class="field"><label>কোড</label><div class="field-input"><input id="cc-code" placeholder="WELCOME50" style="text-transform:uppercase"></div></div>
+      <div class="field"><label>পরিমাণ (৳)</label><div class="field-input"><input id="cc-amount" type="number" min="1" value="50"></div></div>
+      <div class="field"><label>সর্বোচ্চ ব্যবহার (খালি রাখলে unlimited)</label><div class="field-input"><input id="cc-maxuses" type="number" min="1" placeholder="unlimited"></div></div>
+      <div class="err-msg" id="cc-err"></div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">বাতিল</button>
+        <button class="btn btn-primary" style="flex:1" onclick="createRedeemCode(this)">তৈরি করুন</button>
+      </div>
+    </div>
+  </div>`);
+}
+async function createRedeemCode(btn){
+  const err = document.getElementById('cc-err');
+  const code = document.getElementById('cc-code').value.trim().toUpperCase();
+  const amount = Number(document.getElementById('cc-amount').value);
+  const maxUsesRaw = document.getElementById('cc-maxuses').value.trim();
+  if(!code){ err.textContent='কোড লিখুন'; return; }
+  if(!amount || amount<=0){ err.textContent='সঠিক পরিমাণ দিন'; return; }
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      const ref = fb.doc(fb.db,'redeemCodes', code);
+      const existing = await fb.getDoc(ref);
+      if(existing.exists()){ err.textContent='এই কোডটি আগে থেকেই আছে'; return; }
+      const payload = {amount, usedCount:0, active:true, createdAt: fb.serverTimestamp()};
+      if(maxUsesRaw) payload.maxUses = Number(maxUsesRaw);
+      await fb.setDoc(ref, payload);
+      toast('কোড তৈরি করা হয়েছে');
+      closeModal();
+      loadRedeemCodes(true);
+    }catch(e){ console.error(e); err.textContent='তৈরি করা যায়নি'; }
+  });
+}
+async function toggleCodeActive(code, makeActive, btn){
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.updateDoc(fb.doc(fb.db,'redeemCodes',code), {active: makeActive});
+      toast(makeActive ? 'কোড চালু করা হয়েছে' : 'কোড বন্ধ করা হয়েছে');
+      loadRedeemCodes(true);
+    }catch(e){ console.error(e); toast('আপডেট ব্যর্থ হয়েছে'); }
+  });
+}
+
+/* ---------------- WALLETS ---------------- */
+async function loadWallets(force){
+  const fb = window.apexifyAdminFB;
+  const tbody = document.getElementById('wallets-tbody');
+  tbody.innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+  try{
+    const bkashSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'users'), fb.where('bkashVerified','==',false)));
+    const nagadSnap = await fb.getDocs(fb.query(fb.collection(fb.db,'users'), fb.where('nagadVerified','==',false)));
+
+    const rows = [];
+    bkashSnap.docs.forEach(s=>{
+      const u = s.data();
+      if(!u.bkashNumber) return;
+      rows.push({uid:s.id, name:u.name||'—', phone:u.phone||'', type:'bKash', number:u.bkashNumber, field:'bkash'});
+    });
+    nagadSnap.docs.forEach(s=>{
+      const u = s.data();
+      if(!u.nagadNumber) return;
+      rows.push({uid:s.id, name:u.name||'—', phone:u.phone||'', type:'Nagad', number:u.nagadNumber, field:'nagad'});
+    });
+
+    badgeCounts.unverifiedWallets = rows.length;
+    updateBadges();
+    if(rows.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">সব ওয়ালেট যাচাইকৃত ✓</td></tr>`; return; }
+
+    tbody.innerHTML = rows.map(r=>`
+      <tr>
+        <td>${esc(r.name)} · ${esc(r.phone)}</td>
+        <td>${esc(r.type)}</td>
+        <td class="mono">${esc(r.number)}</td>
+        <td class="cell-mute">—</td>
+        <td><button class="btn btn-primary btn-sm" onclick="verifyWallet('${r.uid}','${r.field}',this)">যাচাই করুন</button></td>
+      </tr>`).join('');
+  }catch(e){
+    console.error(e);
+    tbody.innerHTML = `<tr><td class="empty-row" colspan="5" style="color:var(--danger)">লোড ব্যর্থ — Firestore ইনডেক্স বা নিয়ম (rules) চেক করুন</td></tr>`;
+  }
+}
+
+/* ---------------- TRANSACTIONS ---------------- */
+async function loadTransactions(force){
+  const fb = window.apexifyAdminFB;
+  if(force || txCache.length===0){
+    document.getElementById('tx-tbody').innerHTML = `<tr><td class="empty-row" colspan="5"><div class="spinner" style="margin:0 auto;border-top-color:var(--emerald)"></div></td></tr>`;
+    try{
+      const snap = await fb.getDocs(fb.query(fb.collection(fb.db,'transactions'), fb.orderBy('createdAt','desc'), fb.limit(300)));
+      txCache = snap.docs.map(s=>({id:s.id, ...s.data()}));
+    }catch(e){ console.error(e); toast('লেনদেন লোড করা যায়নি'); }
+  }
+  renderTxTable();
+}
+function setTxFilter(f){
+  txFilter=f;
+  document.querySelectorAll('#tx-type-tabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.type===f));
+  renderTxTable();
+}
+function renderTxTable(){
+  let rows = txFilter==='all' ? txCache : txCache.filter(t=>t.type===txFilter);
+  const tbody = document.getElementById('tx-tbody');
+  if(rows.length===0){ tbody.innerHTML = `<tr><td class="empty-row" colspan="5">কোনো লেনদেন নেই</td></tr>`; return; }
+  tbody.innerHTML = rows.map(d=>`
+    <tr>
+      <td>${txTypeChip(d.type)}</td>
+      <td>${esc(d.title||'—')}</td>
+      <td style="font-weight:700; color:${d.amount<0?'var(--danger)':'var(--ok)'}">${d.amount<0?'-':'+'}${fmt(Math.abs(d.amount||0))}</td>
+      <td class="mono cell-mute">${esc((d.uid||'').slice(0,10))}</td>
+      <td class="cell-mute">${fmtDate(d.createdAt)}</td>
+    </tr>`).join('');
+}
+
+/* ---------------- SETTINGS ---------------- */
+async function loadSettings(){
+  const fb = window.apexifyAdminFB;
+  try{
+    const snap = await fb.getDoc(fb.doc(fb.db,'settings','config'));
+    const s = snap.exists() ? snap.data() : {};
+    document.getElementById('set-activationFee').value = s.activationFee ?? 10;
+    document.getElementById('set-referralCommission').value = s.referralCommission ?? 15;
+    document.getElementById('set-dailyFreeIncome').value = s.dailyFreeIncome ?? 30;
+    document.getElementById('set-minDeposit').value = s.minDeposit ?? 50;
+    document.getElementById('set-maxDeposit').value = s.maxDeposit ?? 50000;
+    document.getElementById('set-minWithdraw').value = s.minWithdraw ?? 100;
+    document.getElementById('set-maxWithdraw').value = s.maxWithdraw ?? 20000;
+    document.getElementById('set-salaryTarget').value = s.salaryTarget ?? 50;
+    document.getElementById('set-salaryMonthly').value = s.salaryMonthly ?? 3000;
+    document.getElementById('set-supportLink').value = s.supportLink ?? '';
+    document.getElementById('set-apkLink').value = s.apkLink ?? '';
+    document.getElementById('set-withdrawPolicy').value = s.withdrawPolicy ?? 'all';
+  }catch(e){ console.error(e); toast('সেটিংস লোড করা যায়নি'); }
+}
+async function saveSettings(btn){
+  const err = document.getElementById('settings-err');
+  const activationFee = Number(document.getElementById('set-activationFee').value);
+  const referralCommission = Number(document.getElementById('set-referralCommission').value);
+  const dailyFreeIncome = Number(document.getElementById('set-dailyFreeIncome').value);
+  const minDeposit = Number(document.getElementById('set-minDeposit').value);
+  const maxDeposit = Number(document.getElementById('set-maxDeposit').value);
+  const minWithdraw = Number(document.getElementById('set-minWithdraw').value);
+  const maxWithdraw = Number(document.getElementById('set-maxWithdraw').value);
+  const salaryTarget = Number(document.getElementById('set-salaryTarget').value);
+  const salaryMonthly = Number(document.getElementById('set-salaryMonthly').value);
+  const supportLink = document.getElementById('set-supportLink').value.trim();
+  const apkLink = document.getElementById('set-apkLink').value.trim();
+  const withdrawPolicy = document.getElementById('set-withdrawPolicy').value;
+  const vals = [activationFee,referralCommission,dailyFreeIncome,minDeposit,maxDeposit,minWithdraw,maxWithdraw,salaryTarget,salaryMonthly];
+  if(vals.some(isNaN)){ err.textContent='সঠিক সংখ্যা দিন'; return; }
+  if(minDeposit > maxDeposit){ err.textContent='সর্বনিম্ন ডিপোজিট সর্বোচ্চর চেয়ে বেশি হতে পারবে না'; return; }
+  if(minWithdraw > maxWithdraw){ err.textContent='সর্বনিম্ন উইথড্র সর্বোচ্চর চেয়ে বেশি হতে পারবে না'; return; }
+  err.textContent='';
+  await withBtnLoading(btn, async ()=>{
+    const fb = window.apexifyAdminFB;
+    try{
+      await fb.setDoc(fb.doc(fb.db,'settings','config'), {
+        activationFee, referralCommission, dailyFreeIncome,
+        minDeposit, maxDeposit, minWithdraw, maxWithdraw,
+        salaryTarget, salaryMonthly, supportLink, apkLink, withdrawPolicy,
+        updatedAt: fb.serverTimestamp()
+      }, {merge:true});
+      toast('সেটিংস সংরক্ষণ করা হয়েছে');
+    }catch(e){ console.error(e); err.textContent='সংরক্ষণ ব্যর্থ হয়েছে'; }
+  });
+}
+
+async function backfillPublicProfiles(){
+  const fb = window.apexifyAdminFB;
+  const btn = document.getElementById('backfill-btn');
+  btn.disabled = true; btn.textContent = 'চলছে...';
+  try{
+    const snap = await fb.getDocs(fb.collection(fb.db,'users'));
+    let created = 0, skipped = 0;
+    for(const s of snap.docs){
+      const u = s.data();
+      const pubRef = fb.doc(fb.db,'publicProfiles', s.id);
+      const pubSnap = await fb.getDoc(pubRef);
+      if(pubSnap.exists()){ skipped++; continue; }
+      await fb.setDoc(pubRef, {
+        name: u.name||'User',
+        userId: u.userId||s.id,
+        referralId: u.referralId||'',
+        referrerUid: u.referrerUid||null,
+        status: u.status||'inactive',
+        referralCount: Number(u.referralCount||0),
+        createdAt: u.createdAt||fb.serverTimestamp()
+      });
+      created++;
+    }
+    toast(`সম্পন্ন — ${created} জনের প্রোফাইল তৈরি হয়েছে, ${skipped} জন আগে থেকেই ছিল`);
+  }catch(e){
+    console.error(e);
+    toast('ব্যাকফিল ব্যর্থ হয়েছে — কনসোল চেক করুন');
+  }
+  btn.disabled = false; btn.textContent = 'পুরনো ইউজারদের পাবলিক প্রোফাইল তৈরি করুন';
+}
+
+async function backfillPurchasedFlag(){
+  const fb = window.apexifyAdminFB;
+  const btn = document.getElementById('backfill-purchase-btn');
+  btn.disabled = true; btn.textContent = 'চলছে...';
+  try{
+    const subsSnap = await fb.getDocs(fb.collection(fb.db,'investmentSubscriptions'));
+    const uidsWithPurchase = new Set(subsSnap.docs.map(s=>s.data().uid));
+    let fixed = 0, skipped = 0;
+    for(const uid of uidsWithPurchase){
+      const uSnap = await fb.getDoc(fb.doc(fb.db,'users',uid));
+      if(!uSnap.exists()) continue;
+      if(uSnap.data().hasPurchasedPackage === true){ skipped++; continue; }
+      await fb.updateDoc(fb.doc(fb.db,'users',uid), {hasPurchasedPackage:true});
+      fixed++;
+    }
+    toast(`সম্পন্ন — ${fixed} জনের ঠিক করা হয়েছে, ${skipped} জন আগে থেকেই ঠিক ছিল`);
+  }catch(e){
+    console.error(e);
+    toast('ব্যর্থ হয়েছে — কনসোল চেক করুন');
+  }
+  btn.disabled = false; btn.textContent = 'যারা প্যাকেজ কিনেছে তাদের ফ্ল্যাগ ঠিক করুন';
+}
+
+/* ---------------- AUTH ---------------- */
+async function doAdminLogin(){
+  const fb = window.apexifyAdminFB;
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  err.textContent='';
+  if(!email || !pass){ err.textContent='ইমেইল ও পাসওয়ার্ড দিন'; return; }
+
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+  try{
+    const cred = await fb.signInWithEmailAndPassword(fb.auth, email, pass);
+    if(!ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((cred.user.email||'').toLowerCase())){
+      await fb.signOut(fb.auth);
+      err.textContent='এই একাউন্টে এডমিন অ্যাক্সেস নেই';
+      btn.disabled=false; btn.textContent='সাইন-ইন করুন';
+      return;
+    }
+    // onAuthStateChanged handles the rest
+  }catch(e){
+    console.error(e);
+    const map = {
+      'auth/invalid-credential':'ইমেইল বা পাসওয়ার্ড সঠিক নয়',
+      'auth/user-not-found':'এই ইমেইলে কোনো একাউন্ট নেই',
+      'auth/wrong-password':'পাসওয়ার্ড সঠিক নয়',
+      'auth/invalid-email':'সঠিক ইমেইল দিন',
+      'auth/too-many-requests':'অনেকবার চেষ্টা করা হয়েছে, একটু পর আবার চেষ্টা করুন'
+    };
+    err.textContent = map[e.code] || 'লগইন ব্যর্থ হয়েছে, আবার চেষ্টা করুন';
+    btn.disabled=false; btn.textContent='সাইন-ইন করুন';
+  }
+}
+function doAdminLogout(){
+  confirmAction('লগ-আউট করবেন?','আপনাকে আবার সাইন-ইন করতে হবে।', async ()=>{
+    await window.apexifyAdminFB.signOut(window.apexifyAdminFB.auth);
+  }, 'লগ-আউট');
+}
+
+function showApp(user){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  const sbFoot = document.createElement('div');
+  sbFoot.className='sb-foot';
+  const initial = (user.email||'A')[0].toUpperCase();
+  sbFoot.innerHTML = `
+    <div class="admin-chip">
+      <div class="av">${initial}</div>
+      <div class="info"><b>${esc(user.email)}</b><span>এডমিন</span></div>
+    </div>
+    <button class="btn btn-ghost btn-block btn-sm" onclick="doAdminLogout()">লগ-আউট</button>`;
+  const sidebar = document.getElementById('sidebar');
+  const oldFoot = sidebar.querySelector('.sb-foot');
+  if(oldFoot) oldFoot.remove();
+  sidebar.appendChild(sbFoot);
+  goPage('dashboard');
+}
+function showLogin(){
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-btn').disabled=false;
+  document.getElementById('login-btn').textContent='সাইন-ইন করুন';
+  document.getElementById('login-pass').value='';
+}
+
+/* ---------------- init ---------------- */
+buildSidebarNav();
+
+function startAdminAuthWatcher(){
+  const fb = window.apexifyAdminFB;
+  fb.onAuthStateChanged(fb.auth, (user)=>{
+    if(user && ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((user.email||'').toLowerCase())){
+      showApp(user);
+    }else{
+      if(user) fb.signOut(fb.auth);
+      showLogin();
+    }
+  });
+  const btn = document.getElementById('login-btn');
+  btn.disabled = false;
+  btn.textContent = 'সাইন-ইন করুন';
+}
+
+if(window.apexifyAdminFB){
+  startAdminAuthWatcher();
+}else{
+  window.addEventListener('apexify-admin-fb-ready', startAdminAuthWatcher, {once:true});
+  window.addEventListener('apexify-admin-fb-error', ()=>{
+    document.getElementById('login-err').textContent = 'Firebase লোড করা যায়নি — ইন্টারনেট সংযোগ চেক করুন এবং পেজ রিফ্রেশ করুন';
+  }, {once:true});
+  // Safety net: if neither event fires within 8s (e.g. blocked network request), show a clear message.
+  setTimeout(()=>{
+    if(!window.apexifyAdminFB){
+      document.getElementById('login-err').textContent = 'Firebase লোড হতে দেরি হচ্ছে — ইন্টারনেট সংযোগ চেক করুন এবং পেজ রিফ্রেশ করুন';
+    }
+  }, 8000);
+}
+
+/* expose functions used via inline onclick */
+window.goPage=goPage; window.toggleSidebar=toggleSidebar; window.refreshCurrentPage=refreshCurrentPage;
+window.onGlobalSearch=onGlobalSearch; window.setUserFilter=setUserFilter; window.openUserDetail=openUserDetail;
+window.saveUserStatus=saveUserStatus; window.saveUserBalances=saveUserBalances; window.verifyWallet=verifyWallet; window.resetWallet=resetWallet;
+window.setDepositFilter=setDepositFilter; window.approveDeposit=approveDeposit; window.rejectDeposit=rejectDeposit;
+window.setActivationFilter=setActivationFilter; window.approveActivation=approveActivation; window.rejectActivation=rejectActivation;
+window.setTxFilter=setTxFilter; window.saveSettings=saveSettings; window.doAdminLogin=doAdminLogin;
+window.doAdminLogout=doAdminLogout; window.toggleEye=toggleEye; window.closeModal=closeModal;
+window.setWithdrawalFilter=setWithdrawalFilter; window.approveWithdrawal=approveWithdrawal; window.rejectWithdrawal=rejectWithdrawal;
+window.openCreateCodeModal=openCreateCodeModal; window.createRedeemCode=createRedeemCode; window.toggleCodeActive=toggleCodeActive;
+window.openCreateTaskModal=openCreateTaskModal; window.saveTask=saveTask; window.toggleTaskActive=toggleTaskActive;
+window.setTaskSubFilter=setTaskSubFilter; window.approveTaskSubmission=approveTaskSubmission; window.rejectTaskSubmission=rejectTaskSubmission;
+window.setPwResetFilter=setPwResetFilter; window.resolvePasswordReset=resolvePasswordReset;
+window.setSellConfigTab=setSellConfigTab; window.saveSellConfig=saveSellConfig;
+window.setSellSubService=setSellSubService;
+window.setSellSubFilter=setSellSubFilter; window.approveSellSubmission=approveSellSubmission; window.rejectSellSubmission=rejectSellSubmission;
+window.downloadSellSubmissionsCSV=downloadSellSubmissionsCSV; window.uploadSellSubmissionsCSV=uploadSellSubmissionsCSV;
+window.sendUserNotification=sendUserNotification; window.backfillPublicProfiles=backfillPublicProfiles;
+window.setSalaryFilter=setSalaryFilter; window.approveSalary=approveSalary; window.rejectSalary=rejectSalary;
+window.openCreatePackageModal=openCreatePackageModal; window.savePackage=savePackage; window.togglePackageActive=togglePackageActive;
+</script>
+</body>
+</html>
